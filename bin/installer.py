@@ -1,6 +1,26 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+'''
+pyProjectInstaller
+==================
+
+Python script for pyProject installation. According to the given 
+installation type (execulable script, ANSA button, META button) handles
+all corresponding procedures:
+
+* installs pyProject to the default project structure
+* installs a default sphinx documentation based on main.py documentation string
+* handles the git repository versions
+
+Usage
+-----
+
+pyProjectInstaller 
+
+  
+'''
+
 import os
 import sys
 import traceback

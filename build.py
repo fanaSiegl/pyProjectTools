@@ -17,15 +17,12 @@ PRODUCTIVE_VERSION_BIN = '/data/fem/+software/SKRIPTY/tools/bin'
 
 VERSION_FILE = 'ini/version.ini'
 
-EXECUTABLE = 'bin/creator.py'
-APPLICATION_NAME = 'newPyProject'
-
-EXECUTABLE_INSTALLER = 'bin/installer.py'
-APPLICATION_NAME_INSTALLER = 'pyProjectInstaller'
+EXECUTABLE = 'bin/installer.py'
+APPLICATION_NAME = 'pyProjectInstaller'
 
 DOCUMENTATON_PATH = '/data/fem/+software/SKRIPTY/tools/python/tool_documentation/default'
 DOCUMENTATON_GROUP = 'development tools'
-DOCUMENTATON_DESCRIPTION = 'script for new python project creation.'
+DOCUMENTATON_DESCRIPTION = 'script for new python project installation.'
 
 #==============================================================================
 
@@ -119,17 +116,7 @@ def install():
         os.unlink(symLink)
     os.symlink(executable, symLink)
     
-    os.chmod(symLink, 0775)
-    
-    # sym link for installer
-    symLink = os.path.join(PRODUCTIVE_VERSION_BIN, APPLICATION_NAME_INSTALLER)
-    executable = os.path.join(defaultDir, EXECUTABLE_INSTALLER)
-    if os.path.islink(symLink):
-        os.unlink(symLink)
-    os.symlink(executable, symLink)
-    
-    os.chmod(symLink, 0775)
-    
+    os.chmod(symLink, 0775)    
 
 #==============================================================================
 

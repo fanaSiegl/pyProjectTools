@@ -174,8 +174,7 @@ class InstallerApplication(QtGui.QApplication):
     def showDocumentationPreview(self):
         
         # update doc string
-        self.installer.updateDocString(
-            self.installerPages[cw.DocumentationPageWidget.NAME].getDocString())
+        self.installer.procedureItems[cw.DocumentationPageWidget.NAME].updateDocString()
         
         # build local documentation
         sourceSphinxPath = os.path.normpath(

@@ -244,9 +244,10 @@ class BaseInstallerPageWidget(bw.BaseItemParamSyncWidget):
         
         self.centralWidget = centralWidget
         self.mainWindow = centralWidget.mainWindow
-        self.parentApplication = self.mainWindow.parentApplication       
+        self.parentApplication = self.mainWindow.parentApplication 
+        self.installer = self.parentApplication.installer
         
-        self.installationItem = self.parentApplication.installer.procedureItems[
+        self.installationItem = self.installer.procedureItems[
             self.NAME]
 #             bi.INSTALLER_PROCEDURE_ITEMS[]()
         
@@ -345,7 +346,7 @@ class ExecConfigPageWidget(BaseInstallerPageWidget):
     DESCRIPTION = 'Select the installation type and a name of the executable.'
     PAGE_NO = 0
     
-    mainModuleSet = QtCore.pyqtSignal(object)
+    mainModuleSet = QtCore.pyqtSignal(str)
     
     #--------------------------------------------------------------------------
 
@@ -456,6 +457,8 @@ class ExecConfigPageWidget(BaseInstallerPageWidget):
         if not fileName:
             return
         
+        fileName = str(fileName)
+        
         self._checkMainModuleFileName(fileName)
         
         self.sourcePyProjectLineEdit.setText(fileName)
@@ -474,9 +477,7 @@ class ExecConfigPageWidget(BaseInstallerPageWidget):
     #--------------------------------------------------------------------------
     
     def _checkMainModuleFileName(self, sourceMainPath):
-        
-        sourceMainPath = str(sourceMainPath)
-        
+                
         if len(sourceMainPath) == 0:
             raise ModuleFileNameException('Given file not given!')
         
@@ -494,20 +495,23 @@ class ExecConfigPageWidget(BaseInstallerPageWidget):
         ''' Name for the new loaded module must always be unique. Otherwise
         there are issues obtaining the doc string properly.'''
         
-        tmpFile = tempfile.NamedTemporaryFile()
+#         
+#         tmpFile = tempfile.NamedTemporaryFile()
+#         
+#         mainModule = imp.load_source(tmpFile.name, str(sourceMainPath))
+#         
+#         self.mainModuleSet.emit(mainModule)
         
-        mainModule = imp.load_source(tmpFile.name, str(sourceMainPath))
-        
-        self.mainModuleSet.emit(mainModule)
+        self.mainModuleSet.emit(sourceMainPath)
                 
     #--------------------------------------------------------------------------
     
-    def setupContent(self, mainModule):
+    def setupContent(self):
         
         for execConfigWidgetNo in self.execConfigWidgets.values():
             
             execConfigWidget = self.executableStackedWidget.widget(execConfigWidgetNo)
-            execConfigWidget.setExecSettingsFromMainModule(mainModule)
+            execConfigWidget.setExecSettingsFromMainModule()
         
                   
 #==============================================================================
@@ -588,27 +592,17 @@ class DocumentationPageWidget(BaseInstallerPageWidget):
         
     #--------------------------------------------------------------------------
 
-    def setupContent(self, mainModule):
-        
-        docString = mainModule.__doc__
-        if docString is None:
-            docString = ''
-        try:
-            DOCUMENTATON_GROUP = mainModule.DOCUMENTATON_GROUP
-        except AttributeError:
-            DOCUMENTATON_GROUP = ''
-        try:
-            DOCUMENTATON_DESCRIPTION = mainModule.DOCUMENTATON_DESCRIPTION
-        except AttributeError:
-            DOCUMENTATON_DESCRIPTION = ''
-        
-        self.docuGroupCombobox.addNewItem(DOCUMENTATON_GROUP)
+    def setupContent(self):
+                
+        self.docuGroupCombobox.addNewItem(
+            self.installer.mainModuleItem.documentationGroup)
         
         self.docuDescription.clear()
-        self.setDocuDescription(DOCUMENTATON_DESCRIPTION)
+        self.setDocuDescription(
+            self.installer.mainModuleItem.documentationDescription)
         
         self.documentationTextEdit.clear()
-        self.setDocString(docString)
+        self.setDocString(self.installer.mainModuleItem.docString)
         
         self.hasFinished.emit()
 
@@ -634,13 +628,7 @@ class DocumentationPageWidget(BaseInstallerPageWidget):
         
         self.documentationTextEdit.clear()
         self.documentationTextEdit.setText(text)
-    
-    #--------------------------------------------------------------------------
-#     
-#     def getDocString(self):
-#         
-#         return str(self.documentationTextEdit.toPlainText())
-    
+        
     #--------------------------------------------------------------------------
     
     def enableDocStringEditing(self):

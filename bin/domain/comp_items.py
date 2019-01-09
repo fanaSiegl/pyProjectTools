@@ -17,9 +17,10 @@ class Installer(object):
     
     def __init__(self):
         
-        self.procedureItems = dict()
+        self.mainModuleItem = bi.MainModuleItem()
         
-        self.mainModule = None
+        self.procedureItems = dict()
+                
         self.mainModulePath = ''
         self.pyProjectPath = ''
         
@@ -44,24 +45,28 @@ class Installer(object):
         tagList = self.procedureItems[bi.VersionItem.NAME].tagList
         if tagName not in tagList:
             self.procedureItems[bi.DocumetationItem.NAME].updateDocString()
-            
+              
             self._createNewRevision(
                 self.procedureItems[bi.VersionItem.NAME].tagName,
                 self.procedureItems[bi.VersionItem.NAME].commitMessage,
                 self.procedureItems[bi.VersionItem.NAME].filesToAdd)
-         
+          
         self.procedureItems[bi.InstallationSetupItem.NAME].installTypeItem.install(
             self.pyProjectPath,
             self.procedureItems[bi.VersionItem.NAME].tagName,
             self.procedureItems[bi.InstallationSetupItem.NAME].projectName,
             self.procedureItems[bi.DocumetationItem.NAME].docuGroup,
-            self.procedureItems[bi.DocumetationItem.NAME].docuDescription)
+            self.procedureItems[bi.DocumetationItem.NAME].docuDescription,
+            self.procedureItems[bi.DocumetationItem.NAME].docString)
+        
+#         self._createMasterRepository()
         
     #---------------------------------------------------------------------------
     
-    def setMainModule(self, mainModule, mainModulePath):
+    def setMainModule(self, mainModulePath):
         
-        self.mainModule = mainModule
+        self.mainModuleItem.load(mainModulePath)
+        
         self.mainModulePath = mainModulePath
         self.pyProjectPath = os.path.dirname(os.path.dirname(mainModulePath))
     
@@ -81,5 +86,28 @@ class Installer(object):
         # add tag
         utils.runSubprocess('git tag %s' % tagName, cwd=os.path.dirname(
             os.path.dirname(self.mainModulePath)))
+    
+    #---------------------------------------------------------------------------
+    
+    def _createMasterRepository(self):
+        
+        print 'Master repository synchronisation'
+        
+        reposPath = self.procedureItems[bi.InstallationSetupItem.NAME].installTypeItem.REPOS_PATH
+        projectName = self.procedureItems[bi.InstallationSetupItem.NAME].projectName
+        masterReposPath = os.path.join(reposPath, projectName)
+        
+        # check if repository exists
+        if not os.path.isdir(masterReposPath):
+            os.makedirs(masterReposPath)
+            
+            utils.runSubprocess('git init', cwd=masterReposPath)
+        
+        localReposPath = os.path.dirname(os.path.dirname(self.mainModulePath))
+        utils.runSubprocess('git pull %s' % localReposPath, cwd=masterReposPath)
+        
+        utils.runSubprocess('git checkout master', cwd=masterReposPath)
+        utils.runSubprocess('git fetch --tag %s' % localReposPath, cwd=masterReposPath)
+        
         
 #=============================================================================

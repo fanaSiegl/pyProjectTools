@@ -4,7 +4,9 @@
 import os
 import sys
 import string
+import tempfile
 import shutil
+import imp
 
 from domain import utils
 
@@ -65,13 +67,18 @@ class BaseInstallType(BaseParamItem):
     EXECUTABLE = 'bin/main.py'
     PRODUCTIVE_VERSION_BIN = '/data/fem/+software/SKRIPTY/tools/bin'
     PRODUCTIVE_VERSION_HOME = '/data/fem/+software/SKRIPTY/tools/python'
-    REPOS_PATH = '/data/fem/+software/SKRIPTY/tools/repos/ansaTools'
+    REPOS_PATH = '/data/fem/+software/SKRIPTY/tools/repos'
     VERSION_FILE = 'ini/version.ini'
     DOCUMENTATON_PATH = '/data/fem/+software/SKRIPTY/tools/python/tool_documentation/default'
     
+    def __init__(self, parentInstaller):
+        super(BaseInstallType, self).__init__()
+        
+        self.parentInstaller = parentInstaller
+    
     #---------------------------------------------------------------------------
     
-    def install(self, pyProjectPath, revision, applicationName, docuGroup, docuDescription):
+    def install(self, pyProjectPath, revision, applicationName, docuGroup, docuDescription, docString):
         
         print 'Installing: %s' % self.NAME
         
@@ -82,6 +89,7 @@ class BaseInstallType(BaseParamItem):
         self.applicationName = applicationName
         self.docuGroup = docuGroup
         self.docuDescription = docuDescription
+        self.docString = docString
         
         self._createRevisionContents()
                 
@@ -170,7 +178,7 @@ MODIFIED = ${lastModified}'''
             os.unlink(defaultDir)
         os.symlink(self.revision, defaultDir)
         
-        symLink = os.path.join(self.PRODUCTIVE_VERSION_BIN, self.applicationName)
+        symLink = os.path.join(self.PRODUCTIVE_VERSION_BIN, self.executableName)
         executable = os.path.join(defaultDir, self.EXECUTABLE)
         if os.path.islink(symLink):
             os.unlink(symLink)
@@ -191,6 +199,22 @@ MODIFIED = ${lastModified}'''
         SPHINX_BUILD = os.path.join(SPHINX_DOC, 'sphinx-build.py')
         GIT_REVISION_HISTORY = os.path.join(SPHINX_SOURCE, 'revision_history.rst')
         
+        # update index file
+        newIndexLines = list()
+        fi = open(os.path.join(SPHINX_SOURCE, 'index.rst'), 'rt')
+        for line in fi.readlines():
+            if line.startswith('.. automodule:: main'):
+                newIndexLines.append('\n%s\n' % self.docString)
+            else:
+                newIndexLines.append(line)
+        fi.close()
+        
+        fo = open(os.path.join(SPHINX_SOURCE, 'index.rst'), 'wt')
+        for line in newIndexLines:
+            fo.write(line)
+        fo.close()
+        
+        # create revision history
         HEADER = '''
 Revision history
 ================
@@ -259,8 +283,8 @@ class InstallTypeExecutable(BaseInstallType):
     REPOS_PATH = '/data/fem/+software/SKRIPTY/tools/repos'
     PRODUCTIVE_VERSION_BIN = '/data/fem/+software/SKRIPTY/tools/bin'
 
-    def __init__(self):
-        super(InstallTypeExecutable, self).__init__()
+    def __init__(self, parentInstaller):
+        super(InstallTypeExecutable, self).__init__(parentInstaller)
         
         self.executableName = ''
     
@@ -280,11 +304,14 @@ class InstallTypeAnsaButton(BaseInstallType):
     REPOS_PATH = '/data/fem/+software/SKRIPTY/tools/repos/ansaTools'
     PRODUCTIVE_VERSION_BIN = '/data/fem/+software/SKRIPTY/tools/python/ansa_toolkit/default/ansa_toolkit/python_scripts'
     
-    def __init__(self):
-        super(InstallTypeAnsaButton, self).__init__()
+    def __init__(self, parentInstaller):
+        super(InstallTypeAnsaButton, self).__init__(parentInstaller)
         
         self.buttonGroupName = ''
         self.buttonName = ''
+        self.execFunction = ''
+        
+        self.decoratorPresent = False
     
     #---------------------------------------------------------------------------
     
@@ -294,15 +321,55 @@ class InstallTypeAnsaButton(BaseInstallType):
             'ANSA User script button group name')
         self.checker._checkEmptyParam('buttonName', 'Tool button name')
         
+    #---------------------------------------------------------------------------
     
+    def _installAsDefault(self):
+        
+        print 'Releasing to the productive version'
+        
+        defaultDir = os.path.join(self.applicationPath, 'default')
+        
+        if os.path.islink(defaultDir):
+            os.unlink(defaultDir)
+        os.symlink(self.revision, defaultDir)
+        
+        symLink = os.path.join(self.PRODUCTIVE_VERSION_BIN, 'tool_%s.py' % self.buttonName)
+        executable = os.path.join(defaultDir, self.EXECUTABLE)
+        if os.path.islink(symLink):
+            os.unlink(symLink)
+        os.symlink(executable, symLink)
+        
+        os.chmod(symLink, 0775)
+    
+    #---------------------------------------------------------------------------
+    
+    def _insertAnsaButtonDecorator(self):
+        
+        if not self.decoratorPresent:
+            self.parentInstaller.mainModuleItem.insertAnsaButtonDecorator(
+                self.execFunction, self.buttonGroupName, self.buttonName)
+    
+    #---------------------------------------------------------------------------
+    
+    def install(self, pyProjectPath, revision, applicationName, docuGroup, docuDescription, docString):
+        
+        self._insertAnsaButtonDecorator()
+        
+        super(InstallTypeAnsaButton, self).install(
+            pyProjectPath, revision, applicationName, docuGroup, docuDescription, docString)
+    
+        
 #==============================================================================
 @utils.registerClass
 class InstallTypeMeta(BaseInstallType):
 
     NAME = BaseInstallType.TYPE_META
-
-    def __init__(self):
-        super(InstallTypeMeta, self).__init__()
+    PRODUCTIVE_VERSION_HOME = '/data/fem/+software/SKRIPTY/tools/python/metaTools'
+    REPOS_PATH = '/data/fem/+software/SKRIPTY/tools/repos/metaTools'
+    PRODUCTIVE_VERSION_BIN = '/data/fem/+software/SKRIPTY/tools/python/meta_toolkit/default/meta_toolkit/python_scripts'
+    
+    def __init__(self, parentInstaller):
+        super(InstallTypeMeta, self).__init__(parentInstaller)
         
         self.toolbarName = ''
         self.buttonName = ''
@@ -313,8 +380,28 @@ class InstallTypeMeta(BaseInstallType):
         
         self.checker._checkEmptyParam('toolbarName', 'META Toolbar name')
         self.checker._checkEmptyParam('buttonName', 'Tool button name')
-        
+
+    #---------------------------------------------------------------------------
     
+    def _installAsDefault(self):
+        
+        print 'Releasing to the productive version'
+        
+        defaultDir = os.path.join(self.applicationPath, 'default')
+        
+        if os.path.islink(defaultDir):
+            os.unlink(defaultDir)
+        os.symlink(self.revision, defaultDir)
+        
+        symLink = os.path.join(self.PRODUCTIVE_VERSION_BIN, 'tool_%s.py' % self.buttonName)
+        executable = os.path.join(defaultDir, self.EXECUTABLE)
+        if os.path.islink(symLink):
+            os.unlink(symLink)
+        os.symlink(executable, symLink)
+        
+        os.chmod(symLink, 0775)
+        
+        
 #==============================================================================
 
 class BaseInstallerProcedureItem(BaseParamItem):
@@ -369,10 +456,11 @@ class DocumetationItem(BaseInstallerProcedureItem):
     
     def updateDocString(self):
         
-        docString = self.parentInstaller.mainModule.__doc__
-                        
+        # original string
+        docString = self.parentInstaller.mainModuleItem.docString
+        
         # no doc string present
-        if docString is None:
+        if not self.parentInstaller.mainModuleItem.hasDocString:
             self._createNewDocString(self.docString)        
         # existing string to be updated
         elif docString != self.docString:
@@ -414,7 +502,8 @@ class DocumetationItem(BaseInstallerProcedureItem):
     
     def _changeExistingDocString(self, text):
         
-        docString = self.parentInstaller.mainModule.__doc__
+        # original string
+        docString = self.parentInstaller.mainModuleItem.docString
         
         fi = open(self.parentInstaller.mainModulePath, 'rt')
         content = fi.read()
@@ -520,11 +609,11 @@ class BaseInstallItemChecker(object):
         
         documentationInstallItem = self.installItem.parentInstaller.procedureItems[DocumetationItem.NAME]
         
-        docString = self.installItem.parentInstaller.mainModule.__doc__
+        docString = self.installItem.parentInstaller.mainModuleItem.docString
         
         if self.installItem.tagName in self.installItem.tagList:
             # no doc string present
-            if docString is None:
+            if not self.installItem.parentInstaller.mainModuleItem.hasDocString:
                 message = 'Documentation string has been created. New version must be made with a new tag!'
                 self.report.append([self.CHECK_TYPE_CRITICAL, message])
                 self.status += self.CHECK_TYPE_CRITICAL       
@@ -553,3 +642,170 @@ class BaseInstallItemChecker(object):
     
 
 #=============================================================================
+
+class MainModuleItem(object):
+    
+    def __init__(self):
+        
+        self._initiateParameters()
+    
+    #---------------------------------------------------------------------------
+    
+    def _initiateParameters(self):
+                
+        self.docHeaderLines = list()
+        
+        self.hasDocString = False
+        self.docString = ''
+        self.applicationName = ''
+        self.documentationGroup = ''
+        self.documentationDescription = ''
+    
+    #---------------------------------------------------------------------------
+    
+    def load(self, sourceMainPath):
+        
+        self.sourceMainPath = sourceMainPath
+        self._initiateParameters()
+    
+        self._parse()
+        self._findDocString()
+                
+    #---------------------------------------------------------------------------
+    
+    def _parse(self):
+        
+        fi = open(self.sourceMainPath, 'rt')
+        
+        self.content = fi.read()
+        self.lines = self.content.split('\n')
+        
+        fi.close()
+    
+    #---------------------------------------------------------------------------
+    
+    def _findDocString(self):
+        
+        for line in self.lines:
+            if line.startswith('import'):
+                break
+            else:
+                self.docHeaderLines.append(line)
+                
+        tmpFile = tempfile.NamedTemporaryFile(suffix='.py', delete=False)
+        
+        fo = open(tmpFile.name, 'wt')
+        fo.write('\n'.join(self.docHeaderLines))
+        fo.close()
+        
+        mainModule = imp.load_source(
+            os.path.basename(tmpFile.name)[:-3], tmpFile.name)
+        
+        if mainModule.__doc__ is not None:
+            self.docString = mainModule.__doc__
+            self.hasDocString = True
+        
+        self._findProjectParams(mainModule)
+    
+    #---------------------------------------------------------------------------
+    
+    def _findProjectParams(self, mainModule):
+        
+        try:
+            self.applicationName = mainModule.APPLICATION_NAME
+        except AttributeError:
+            pass
+        try:
+            self.documentationGroup = mainModule.DOCUMENTATON_GROUP
+        except AttributeError:
+            pass
+        try:
+            self.documentationDescription = mainModule.DOCUMENTATON_DESCRIPTION
+        except AttributeError:
+            pass
+        
+        if self.applicationName != '' and self.documentationGroup != '' and  self.documentationDescription != '':
+            return
+        
+        # alternative search
+        def getLineParamValue(line):
+            parts = line.split('=')
+            return parts[-1].strip()
+        
+        for line in self.lines:
+            if line.startswith('APPLICATION_NAME') and self.applicationName == '':
+                self.applicationName = getLineParamValue(line)
+            elif line.startswith('DOCUMENTATON_GROUP') and self.documentationGroup == '':
+                self.documentationGroup = getLineParamValue(line)
+            elif line.startswith('DOCUMENTATON_DESCRIPTION') and self.documentationDescription == '':
+                self.documentationDescription = getLineParamValue(line)
+    
+    #---------------------------------------------------------------------------
+    
+    def _stripFunctionParamString(self, string):
+        
+        
+        string = string.strip().replace('"','')
+        string = string.replace("'",'')
+        return string
+    
+    #---------------------------------------------------------------------------
+    
+    def getListOfFunctions(self):
+        
+        functions = dict()
+        for lineNo, line in enumerate(self.lines):
+            if line.startswith('def'):
+                parts = line.split('(')
+                funcName = parts[0].replace('def', '')
+                
+                functions[funcName.strip()] = lineNo
+        return functions
+    
+    #---------------------------------------------------------------------------
+    
+    def getListOfAnsaButtonDecoratedFunctions(self):
+        
+        functions = list()
+        for lineNo, line in enumerate(self.lines):
+            if line.startswith('def'):
+                if self.lines[lineNo - 1].startswith('@ansa.session.defbutton'):
+                    # decorator
+                    parts = self.lines[lineNo - 1].split('(')
+                    params = parts[1].replace(')', '')
+                    paramParts = params.split(',')
+                    group = paramParts[0]
+                    buttonName = paramParts[1]
+                    
+                    # decorated function
+                    parts = line.split('(')
+                    funcName = parts[0].replace('def', '')
+                    
+                    funcName = self._stripFunctionParamString(funcName)
+                    
+                    functions.append({
+                        funcName : [group, buttonName]})
+        return functions
+    
+    #---------------------------------------------------------------------------
+    
+    def insertAnsaButtonDecorator(self, execFunction, buttonGroupName, buttonName):
+        
+        listOfFuntions = self.getListOfFunctions()
+        
+        lineNo = listOfFuntions[execFunction]
+        
+        newLine = '@ansa.session.defbutton("%s", "%s")' % (
+            buttonGroupName, buttonName)
+        
+        lines = self.lines[:]
+        lines.insert(lineNo, newLine)
+        
+        fo = open(self.sourceMainPath, 'wt')
+        for line in lines:
+            fo.write('%s\n' % line)
+        fo.close() 
+                
+        
+#=============================================================================
+

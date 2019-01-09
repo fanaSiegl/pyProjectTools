@@ -91,25 +91,21 @@ class InstallerApplication(QtGui.QApplication):
             
     #---------------------------------------------------------------------------
     @saveExecute
-    def setupContent(self, mainModule):
+    def setupContent(self, sourceMainPath):
         
-        self._setMainModule(mainModule)
+        self._setMainModule(sourceMainPath)
+        self.installer.setMainModule(self.sourceMainPath)
         
-        self.installerPages[cw.ExecConfigPageWidget.NAME].setupContent(mainModule)
-        self.installerPages[cw.DocumentationPageWidget.NAME].setupContent(mainModule)
+        self.installerPages[cw.ExecConfigPageWidget.NAME].setupContent()
+        self.installerPages[cw.DocumentationPageWidget.NAME].setupContent()
         self.installerPages[cw.VersionPageWidget.NAME].setupContent()
-        
-        self.installer.setMainModule(mainModule, self.sourceMainPath)
-                        
+                                
     #---------------------------------------------------------------------------
     
-    def _setMainModule(self, mainModule):
+    def _setMainModule(self, sourceMainPath):
         
-        self.sourceMainPath = os.path.realpath(mainModule.__file__)
-        if self.sourceMainPath.endswith('.pyc'):
-            self.sourceMainPath = self.sourceMainPath[:-1]
-        
-#         self.sourceMainPath = sourceMainPath
+        self.sourceMainPath = str(sourceMainPath)
+
         self.workDir = os.path.dirname(self.sourceMainPath)
 
     #--------------------------------------------------------------------------
@@ -194,15 +190,6 @@ class InstallerApplication(QtGui.QApplication):
     def runInstallation(self):
         
         self.installer.install()
-#         self.installer.updateDocString(
-#             self.installerPages[cw.DocumentationPageWidget.NAME].getDocString())
-#         
-#         self.installer.createNewRevision(
-#             self.installerPages[cw.VersionPageWidget.NAME].getTagName(),
-#             self.installerPages[cw.VersionPageWidget.NAME].getCommitMessage(),
-#             self.installerPages[cw.VersionPageWidget.NAME].getNewFilesToAdd())
-#         
-#         self.installer.installationTypeItem.install()
         
         self.restoreOverrideCursor()
         

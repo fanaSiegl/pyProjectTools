@@ -41,16 +41,19 @@ class Installer(object):
         is made just when there was a new tag required. New revision is
         omitted otherwise.'''
         
+        # this will ensure that all procedure will be done prior to
+        # creating a new revision
+        for procedureItem in self.procedureItems.values():
+            procedureItem.updateForInstallation()   
+        
         tagName = self.procedureItems[bi.VersionItem.NAME].tagName
         tagList = self.procedureItems[bi.VersionItem.NAME].tagList
-        if tagName not in tagList:
-            self.procedureItems[bi.DocumetationItem.NAME].updateDocString()
-              
+        if tagName not in tagList:              
             self._createNewRevision(
                 self.procedureItems[bi.VersionItem.NAME].tagName,
                 self.procedureItems[bi.VersionItem.NAME].commitMessage,
                 self.procedureItems[bi.VersionItem.NAME].filesToAdd)
-          
+           
         self.procedureItems[bi.InstallationSetupItem.NAME].installTypeItem.install(
             self.pyProjectPath,
             self.procedureItems[bi.VersionItem.NAME].tagName,
@@ -58,8 +61,8 @@ class Installer(object):
             self.procedureItems[bi.DocumetationItem.NAME].docuGroup,
             self.procedureItems[bi.DocumetationItem.NAME].docuDescription,
             self.procedureItems[bi.DocumetationItem.NAME].docString)
-        
-#         self._createMasterRepository()
+         
+        self._createMasterRepository()
         
     #---------------------------------------------------------------------------
     

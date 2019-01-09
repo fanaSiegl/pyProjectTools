@@ -547,10 +547,7 @@ class ExecConfigAnsaButtonWidget(BaseConfigExecutableWidget):
     #---------------------------------------------------------------------------
     
     def setProjectName(self, projectName):
-                    
-        self.buttonNameLineEdit.clear()
-        self.buttonNameLineEdit.setText(projectName)
-        
+                
         self.buttonGroupLineEdit.clear()
         
         # setup exec function combobox
@@ -583,7 +580,11 @@ class ExecConfigAnsaButtonWidget(BaseConfigExecutableWidget):
                 self.execFunctionNameComboBox.addItem(functionName)
             
             self.installationItem.decoratorPresent = False
-     
+        
+        # fill in button name 
+        if len(projectName) > 0: 
+            self.buttonNameLineEdit.clear()
+            self.buttonNameLineEdit.setText(projectName)
         
 #==============================================================================
 @utils.registerClass

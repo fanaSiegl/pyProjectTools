@@ -77,6 +77,11 @@ class BaseInstallType(BaseParamItem):
         self.parentInstaller = parentInstaller
     
     #---------------------------------------------------------------------------
+        
+    def updateForInstallation(self):
+        pass
+    
+    #---------------------------------------------------------------------------
     
     def install(self, pyProjectPath, revision, applicationName, docuGroup, docuDescription, docString):
         
@@ -294,6 +299,9 @@ class InstallTypeExecutable(BaseInstallType):
         
         self.checker._checkEmptyParam('executableName',
             'Name of the executable for the script')
+        self.checker._checkSpacesInParam('executableName',
+            'Name of the executable for the script')
+    
 
 #==============================================================================
 @utils.registerClass
@@ -320,6 +328,7 @@ class InstallTypeAnsaButton(BaseInstallType):
         self.checker._checkEmptyParam('buttonGroupName',
             'ANSA User script button group name')
         self.checker._checkEmptyParam('buttonName', 'Tool button name')
+        self.checker._checkSpacesInParam('buttonName', 'Tool button name')
         
     #---------------------------------------------------------------------------
     
@@ -350,14 +359,10 @@ class InstallTypeAnsaButton(BaseInstallType):
                 self.execFunction, self.buttonGroupName, self.buttonName)
     
     #---------------------------------------------------------------------------
-    
-    def install(self, pyProjectPath, revision, applicationName, docuGroup, docuDescription, docString):
+        
+    def updateForInstallation(self):
         
         self._insertAnsaButtonDecorator()
-        
-        super(InstallTypeAnsaButton, self).install(
-            pyProjectPath, revision, applicationName, docuGroup, docuDescription, docString)
-    
         
 #==============================================================================
 @utils.registerClass
@@ -411,6 +416,12 @@ class BaseInstallerProcedureItem(BaseParamItem):
         super(BaseInstallerProcedureItem, self).__init__()
         
         self.parentInstaller = parentInstaller
+    
+    #---------------------------------------------------------------------------
+    
+    def updateForInstallation(self):
+        
+        pass
         
 #=============================================================================
 @utils.registerClass
@@ -430,7 +441,12 @@ class InstallationSetupItem(BaseInstallerProcedureItem):
         
         return self.installTypeItem.check()
         
+    #---------------------------------------------------------------------------
         
+    def updateForInstallation(self):
+        
+        self.installTypeItem.updateForInstallation()
+             
 #=============================================================================
 @utils.registerClass
 class DocumetationItem(BaseInstallerProcedureItem):
@@ -453,9 +469,9 @@ class DocumetationItem(BaseInstallerProcedureItem):
         self.checker._checkEmptyParam('docString', 'Documentation string')
  
     #---------------------------------------------------------------------------
-    
-    def updateDocString(self):
         
+    def updateForInstallation(self):
+            
         # original string
         docString = self.parentInstaller.mainModuleItem.docString
         
@@ -472,6 +488,8 @@ class DocumetationItem(BaseInstallerProcedureItem):
     #---------------------------------------------------------------------------
     
     def _createNewDocString(self, text):
+        
+        print 'Creating a new documentation string'
         
         fi = open(self.parentInstaller.mainModulePath, 'rt')
         lines = fi.readlines()
@@ -501,6 +519,8 @@ class DocumetationItem(BaseInstallerProcedureItem):
     #---------------------------------------------------------------------------
     
     def _changeExistingDocString(self, text):
+        
+        print 'Updating existing documentation string'
         
         # original string
         docString = self.parentInstaller.mainModuleItem.docString
@@ -590,7 +610,21 @@ class BaseInstallItemChecker(object):
         else:
             message = '%s check ok.' % description
             self.report.append([self.CHECK_TYPE_OK, message])
-            
+    
+    #---------------------------------------------------------------------------
+    
+    def _checkSpacesInParam(self, paramName, description):
+        
+        value = getattr(self.installItem, paramName)
+        
+        if ' ' in value:
+            message = '%s must not contain spaces!' % description
+            self.report.append([self.CHECK_TYPE_CRITICAL, message])
+            self.status += self.CHECK_TYPE_CRITICAL
+        else:
+            message = '%s check ok.' % description
+            self.report.append([self.CHECK_TYPE_OK, message])
+        
     #---------------------------------------------------------------------------
     
     def _checkNewRevisionFiles(self):
@@ -774,8 +808,8 @@ class MainModuleItem(object):
                     parts = self.lines[lineNo - 1].split('(')
                     params = parts[1].replace(')', '')
                     paramParts = params.split(',')
-                    group = paramParts[0]
-                    buttonName = paramParts[1]
+                    group = self._stripFunctionParamString(paramParts[0])
+                    buttonName = self._stripFunctionParamString(paramParts[1])
                     
                     # decorated function
                     parts = line.split('(')
@@ -785,6 +819,7 @@ class MainModuleItem(object):
                     
                     functions.append({
                         funcName : [group, buttonName]})
+                    
         return functions
     
     #---------------------------------------------------------------------------

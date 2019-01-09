@@ -6,10 +6,11 @@
 import os
 import sys
 import re
+import shutil
 
 from PyQt4 import QtCore
 from PyQt4 import QtGui
-from PyQt4 import QtWebKit
+# from PyQt4 import QtWebKit
 
 from domain import utils
 from domain import base_items as bi
@@ -17,7 +18,62 @@ import base_widgets as bw
 
 #===============================================================================
 
-class DocuPreviewDialog(QtGui.QDialog):
+class DocuPreviewDialog(object):
+
+    def __init__(self, parentApplication):
+
+        self.parentApplication = parentApplication
+        
+    #---------------------------------------------------------------------------
+    
+    def show(self):
+        
+        docString = self.parentApplication.installer.procedureItems[bi.DocumetationItem.NAME].docString
+        
+        TEMPLATE = '''documentation preview
+==========================
+
+.. toctree::
+   :maxdepth: 2
+   
+%s
+
+   '''
+        
+        src = '/data/fem/+software/SKRIPTY/tools/python/newPyProject/default/res/new_project_structure/doc'
+        dst = '/tmp/sphinxTempDoc'
+        
+        sourceSphinxPath = os.path.join(dst, 'sphinx','source')
+        
+        # initiate
+        if os.path.isdir(dst):
+            shutil.rmtree(dst)
+        shutil.copytree(src, dst)
+        
+        if not os.path.isdir(sourceSphinxPath):
+            os.makedirs(sourceSphinxPath)
+        
+        fo = open(os.path.join(sourceSphinxPath, 'index.rst'), 'wt')
+        fo.write(TEMPLATE % docString)
+        fo.close()
+        
+        # copy conf
+        sourceConfPath = os.path.join(utils.PATH_RES, 'conf.py')
+        destConfPath = os.path.join(sourceSphinxPath, 'conf.py')
+        shutil.copy(
+            sourceConfPath,
+            destConfPath)
+        
+        stdout, stderr = utils.runSubprocess(os.path.join(dst, 'sphinx', 'buildHtmlDoc.py') ,
+            cwd = os.path.dirname(sourceSphinxPath))
+        
+        address = os.path.join(dst, 'sphinx','build', 'html', 'index.html')   
+        
+        utils.runSubprocess('firefox %s &' % address)
+    
+#===============================================================================
+
+class DocuPreviewDialog2(QtGui.QDialog):
 
     WIDTH = 1024
     HEIGHT = 768

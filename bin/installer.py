@@ -169,21 +169,27 @@ class InstallerApplication(QtGui.QApplication):
     @saveExecute
     def showDocumentationPreview(self):
         
-        # update doc string
-        self.installer.procedureItems[cw.DocumentationPageWidget.NAME].updateDocString()
-        
-        # build local documentation
-        sourceSphinxPath = os.path.normpath(
-            os.path.join(self.sourceMainPath, '..' ,'..', 'doc', 'sphinx'))
-        
-        stdout, stderr = utils.runSubprocess(os.path.join(sourceSphinxPath, 'buildHtmlDoc.py') ,
-            cwd = sourceSphinxPath)
-         
-        if stderr is not None:
-            raise PyProjectInstallerException(str(stderr))
-            
-        self.dialog = dialogs.DocuPreviewDialog(self, sourceSphinxPath)
+        # create temporary documentation
+        self.dialog = dialogs.DocuPreviewDialog(self)
         self.dialog.show()
+        
+#         return
+#                 
+#         # update doc string
+#         self.installer.procedureItems[cw.DocumentationPageWidget.NAME].updateDocString()
+#         
+#         # build local documentation
+#         sourceSphinxPath = os.path.normpath(
+#             os.path.join(self.sourceMainPath, '..' ,'..', 'doc', 'sphinx'))
+#         
+#         stdout, stderr = utils.runSubprocess(os.path.join(sourceSphinxPath, 'buildHtmlDoc.py') ,
+#             cwd = sourceSphinxPath)
+#          
+#         if stderr is not None:
+#             raise PyProjectInstallerException(str(stderr))
+#             
+#         self.dialog = dialogs.DocuPreviewDialog(self, sourceSphinxPath)
+#         self.dialog.show()
         
     #--------------------------------------------------------------------------
     @saveExecute

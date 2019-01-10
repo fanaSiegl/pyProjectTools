@@ -73,37 +73,37 @@ class DocuPreviewDialog(object):
     
 #===============================================================================
 
-class DocuPreviewDialog2(QtGui.QDialog):
-
-    WIDTH = 1024
-    HEIGHT = 768
-    
-    def __init__(self, parentApplication, sourceSphinxPath):
-        super(DocuPreviewDialog, self).__init__()
-        
-        self.parentApplication = parentApplication
-        self.address = os.path.join(sourceSphinxPath, 'build', 'html', 'index.html')
-        
-        self._setWindowGeometry()
-        
-        self.setLayout(QtGui.QVBoxLayout())
-        
-        self.browser = QtWebKit.QWebView()
-        self.browser.load(QtCore.QUrl(self.address))
-
-        self.layout().addWidget(self.browser)
-        
-    #---------------------------------------------------------------------------
-
-    def _setWindowGeometry(self):
-        
-        self.setWindowTitle('%s (%s)' % (
-            self.parentApplication.APPLICATION_NAME, self.parentApplication.revision))
-        
-#         self.setWindowIcon(QtGui.QIcon(os.path.join(utils.PATH_ICONS, 'view-web-browser-dom-tree.png')))
-
-        self.resize(self.WIDTH, self.HEIGHT)
-        self.move(QtGui.QApplication.desktop().screen().rect().center()- self.rect().center())
+# class DocuPreviewDialog2(QtGui.QDialog):
+# 
+#     WIDTH = 1024
+#     HEIGHT = 768
+#     
+#     def __init__(self, parentApplication, sourceSphinxPath):
+#         super(DocuPreviewDialog, self).__init__()
+#         
+#         self.parentApplication = parentApplication
+#         self.address = os.path.join(sourceSphinxPath, 'build', 'html', 'index.html')
+#         
+#         self._setWindowGeometry()
+#         
+#         self.setLayout(QtGui.QVBoxLayout())
+#         
+#         self.browser = QtWebKit.QWebView()
+#         self.browser.load(QtCore.QUrl(self.address))
+# 
+#         self.layout().addWidget(self.browser)
+#         
+#     #---------------------------------------------------------------------------
+# 
+#     def _setWindowGeometry(self):
+#         
+#         self.setWindowTitle('%s (%s)' % (
+#             self.parentApplication.APPLICATION_NAME, self.parentApplication.revision))
+#         
+# #         self.setWindowIcon(QtGui.QIcon(os.path.join(utils.PATH_ICONS, 'view-web-browser-dom-tree.png')))
+# 
+#         self.resize(self.WIDTH, self.HEIGHT)
+#         self.move(QtGui.QApplication.desktop().screen().rect().center()- self.rect().center())
 
 
 #==============================================================================

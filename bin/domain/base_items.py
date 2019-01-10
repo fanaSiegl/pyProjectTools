@@ -204,20 +204,20 @@ MODIFIED = ${lastModified}'''
         SPHINX_BUILD = os.path.join(SPHINX_DOC, 'sphinx-build.py')
         GIT_REVISION_HISTORY = os.path.join(SPHINX_SOURCE, 'revision_history.rst')
         
-        # update index file
-        newIndexLines = list()
-        fi = open(os.path.join(SPHINX_SOURCE, 'index.rst'), 'rt')
-        for line in fi.readlines():
-            if line.startswith('.. automodule:: main'):
-                newIndexLines.append('\n%s\n' % self.docString)
-            else:
-                newIndexLines.append(line)
-        fi.close()
-        
-        fo = open(os.path.join(SPHINX_SOURCE, 'index.rst'), 'wt')
-        for line in newIndexLines:
-            fo.write(line)
-        fo.close()
+#         # update index file
+#         newIndexLines = list()
+#         fi = open(os.path.join(SPHINX_SOURCE, 'index.rst'), 'rt')
+#         for line in fi.readlines():
+#             if line.startswith('.. automodule:: main'):
+#                 newIndexLines.append('\n%s\n' % self.docString)
+#             else:
+#                 newIndexLines.append(line)
+#         fi.close()
+#         
+#         fo = open(os.path.join(SPHINX_SOURCE, 'index.rst'), 'wt')
+#         for line in newIndexLines:
+#             fo.write(line)
+#         fo.close()
         
         # create revision history
         HEADER = '''
@@ -251,29 +251,79 @@ Revision history graph::
         
         print 'Updating tool documentation'
         
-        SPHINX_DOC = os.path.join(self.targetDir, 'doc', 'sphinx')
-        SPHINX_HTML = os.path.join(SPHINX_DOC, 'build', 'html')
-        
-        SPHINX_INDEX = os.path.join(SPHINX_HTML, 'index.html')
+        SPHINX_LOCAL_DOC_SOURCE = os.path.join(self.targetDir, 'doc', 'sphinx', 'source')
+    
+        SPHINX_INDEX = os.path.join(
+            self.docuGroup.replace(' ', '_'), self.applicationName,
+            '%s.html' % self.applicationName)
         
         # copy to tool documentation
-        docFileName = os.path.join(self.DOCUMENTATON_PATH, 'source',
-            self.docuGroup.replace(' ', '_'), '%s.rst' % self.applicationName)
+        # create main link file
+        SPHINX_GLOBAL_DOC_SOURCE = os.path.join(self.DOCUMENTATON_PATH, 'source',
+            self.docuGroup.replace(' ', '_'), self.applicationName)
+        docFileName = os.path.join(SPHINX_GLOBAL_DOC_SOURCE,
+            '%s.txt' % self.applicationName)
+            
+        if os.path.exists(SPHINX_GLOBAL_DOC_SOURCE):
+            shutil.rmtree(SPHINX_GLOBAL_DOC_SOURCE)
         
-        if not os.path.exists(os.path.dirname(docFileName)):
-            os.mkdir(os.path.dirname(docFileName))
+        # copy doc source files
+        shutil.copytree(SPHINX_LOCAL_DOC_SOURCE, SPHINX_GLOBAL_DOC_SOURCE)
         
-        if os.path.exists(docFileName):
-            os.remove(docFileName)
-        
+         
         fo = open(docFileName, 'wt')
-        fo.write('.. _%s: %s\n\n' % (self.applicationName, SPHINX_INDEX))
+        fo.write('.. _%s: ./%s\n\n' % (self.applicationName, SPHINX_INDEX))
         fo.write('`%s`_ - %s\n\n' % (self.applicationName, self.docuDescription))
         fo.close()
+    
+        # update index file
+        newIndexLines = list()
+        fi = open(os.path.join(SPHINX_GLOBAL_DOC_SOURCE, 'index.rst'), 'rt')
+        for line in fi.readlines():
+            if line.startswith('.. automodule:: main'):
+                newIndexLines.append('\n%s\n' % self.docString)
+            else:
+                newIndexLines.append(line)
+        fi.close()
+        
+        fo = open(os.path.join(SPHINX_GLOBAL_DOC_SOURCE, '%s.rst' % self.applicationName), 'wt')
+        for line in newIndexLines:
+            fo.write(line)
+        fo.close()
+            
+        # delete redundant files
+        if os.path.isfile(os.path.join(SPHINX_GLOBAL_DOC_SOURCE, 'conf.py')):
+            os.remove(os.path.join(SPHINX_GLOBAL_DOC_SOURCE, 'conf.py'))
+        if os.path.isfile(os.path.join(SPHINX_GLOBAL_DOC_SOURCE, 'index.rst')):
+            os.remove(os.path.join(SPHINX_GLOBAL_DOC_SOURCE, 'index.rst'))
         
         # update tool documentation
         updateScriptPath = os.path.join(self.DOCUMENTATON_PATH, 'buildHtmlDoc.py')
         utils.runSubprocess(updateScriptPath)
+                
+#         SPHINX_DOC = os.path.join(self.targetDir, 'doc', 'sphinx')
+#         SPHINX_HTML = os.path.join(SPHINX_DOC, 'build', 'html')
+#         
+#         SPHINX_INDEX = os.path.join(SPHINX_HTML, 'index.html')
+#         
+#         # copy to tool documentation
+#         docFileName = os.path.join(self.DOCUMENTATON_PATH, 'source',
+#             self.docuGroup.replace(' ', '_'), '%s.rst' % self.applicationName)
+#         
+#         if not os.path.exists(os.path.dirname(docFileName)):
+#             os.mkdir(os.path.dirname(docFileName))
+#         
+#         if os.path.exists(docFileName):
+#             os.remove(docFileName)
+#         
+#         fo = open(docFileName, 'wt')
+#         fo.write('.. _%s: %s\n\n' % (self.applicationName, SPHINX_INDEX))
+#         fo.write('`%s`_ - %s\n\n' % (self.applicationName, self.docuDescription))
+#         fo.close()
+#         
+#         # update tool documentation
+#         updateScriptPath = os.path.join(self.DOCUMENTATON_PATH, 'buildHtmlDoc.py')
+#         utils.runSubprocess(updateScriptPath)
         
     
     #---------------------------------------------------------------------------

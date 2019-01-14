@@ -63,15 +63,30 @@ class Installer(object):
             self.procedureItems[bi.DocumetationItem.NAME].docString)
          
         self._createMasterRepository()
-        
+    
     #---------------------------------------------------------------------------
     
     def setMainModule(self, mainModulePath):
         
         self.mainModuleItem.load(mainModulePath)
         
-        self.mainModulePath = mainModulePath
-        self.pyProjectPath = os.path.dirname(os.path.dirname(mainModulePath))
+        # handle ANSA check type special behavior
+        if self.getCurrentInstallType() == bi.BaseInstallType.TYPE_ANSA_CHECK:
+        
+            self.mainModulePath = bi.InstallTypeAnsaCheck.CHECK_INSTALLER_PATH
+            self.pyProjectPath = os.path.dirname(
+                os.path.dirname(self.mainModulePath))
+            self.mainModuleItem.documentationDescription = 'IDIADA ANSA checks documentation.'
+            self.mainModuleItem.documentationGroup = 'ANSA tools'
+        else:
+            self.mainModulePath = mainModulePath
+            self.pyProjectPath = os.path.dirname(os.path.dirname(mainModulePath))
+    
+    #---------------------------------------------------------------------------
+    
+    def getCurrentInstallType(self):
+        
+        return self.procedureItems[bi.InstallationSetupItem.NAME].installTypeItem.NAME
     
     #---------------------------------------------------------------------------
     
@@ -79,6 +94,7 @@ class Installer(object):
                 
         # add files
         for newFileName in newFileList:
+            print 'Adding file to repository: %s' % newFileName
             utils.runSubprocess('git add %s' % newFileName, cwd=os.path.dirname(
                 os.path.dirname(self.mainModulePath)))
         
@@ -107,7 +123,10 @@ class Installer(object):
             utils.runSubprocess('git init', cwd=masterReposPath)
         
         localReposPath = os.path.dirname(os.path.dirname(self.mainModulePath))
-        utils.runSubprocess('git pull %s' % localReposPath, cwd=masterReposPath)
+        
+        # handle ANSA check type special behavior
+        if not self.getCurrentInstallType() == bi.BaseInstallType.TYPE_ANSA_CHECK:
+            utils.runSubprocess('git pull %s' % localReposPath, cwd=masterReposPath)
         
         utils.runSubprocess('git checkout master', cwd=masterReposPath)
         utils.runSubprocess('git fetch --tag %s' % localReposPath, cwd=masterReposPath)

@@ -61,9 +61,9 @@ class BaseInstallType(BaseParamItem):
     container = INSTALL_TYPES
     TYPE_EXECUTABLE = 'Executable script'
     TYPE_ANSA_BUTTON = 'ANSA user script button'
-    TYPE_META = 'META session'
-    
-    
+    TYPE_META = 'META script'
+    TYPE_ANSA_CHECK = 'ANSA check'
+        
     EXECUTABLE = 'bin/main.py'
     PRODUCTIVE_VERSION_BIN = '/data/fem/+software/SKRIPTY/tools/bin'
     PRODUCTIVE_VERSION_HOME = '/data/fem/+software/SKRIPTY/tools/python'
@@ -71,11 +71,19 @@ class BaseInstallType(BaseParamItem):
     VERSION_FILE = 'ini/version.ini'
     DOCUMENTATON_PATH = '/data/fem/+software/SKRIPTY/tools/python/tool_documentation/default'
     
+    SOURCE_FILE_FILTER = 'pyProject main.py (main.py)'
+    
     def __init__(self, parentInstaller):
         super(BaseInstallType, self).__init__()
         
         self.parentInstaller = parentInstaller
     
+    #---------------------------------------------------------------------------
+    
+    def getProjectNameFromSourceFile(self, fileName):
+        
+        return os.path.basename(os.path.dirname(os.path.dirname(str(fileName))))
+        
     #---------------------------------------------------------------------------
         
     def updateForInstallation(self):
@@ -413,7 +421,109 @@ class InstallTypeAnsaButton(BaseInstallType):
     def updateForInstallation(self):
         
         self._insertAnsaButtonDecorator()
+
+#==============================================================================
+@utils.registerClass
+class InstallTypeAnsaCheck(BaseInstallType):
+    
+    NAME = BaseInstallType.TYPE_ANSA_CHECK
+    SOURCE_FILE_FILTER = 'ANSA check_*.py (check_*.py)'
+
+#TODO: installation is made from repository - change it to "update_ansa_checks" productive version
+    
+    CHECK_INSTALLER_PATH = '/data/fem/+software/SKRIPTY/tools/repos/ansaChecksPlistUpdater/bin/main.py'
+    CHECK_INSTALLER_CHECK_PATH = '/data/fem/+software/SKRIPTY/tools/repos/ansaChecksPlistUpdater/res/checks'
+    PRODUCTIVE_VERSION_HOME = '/data/fem/+software/SKRIPTY/tools/python/ansaTools/checks/general_check/'
+    
+    #---------------------------------------------------------------------------
+    
+    def getProjectNameFromSourceFile(self, fileName):
         
+        projectName = os.path.basename(str(fileName))
+        projectName = os.path.splitext(projectName)[0]
+        
+        return projectName.replace('check_', '')
+    
+    #---------------------------------------------------------------------------
+    
+    def addChecks(self):
+        
+        self.checker._checkAnsaCheckScript()
+    
+    #---------------------------------------------------------------------------
+    
+    def install(self, pyProjectPath, revision, applicationName, docuGroup, docuDescription, docString):
+        
+        print 'Installing: %s' % self.NAME
+        
+        self.targetDir = os.path.join(self.PRODUCTIVE_VERSION_HOME, revision)
+        self.revision = revision
+        self.docuGroup = docuGroup
+        self.docuDescription = docuDescription
+        
+        # read original docString from check parent updater
+        checksParentUpdater = MainModuleItem()
+        checksParentUpdater.load(self.CHECK_INSTALLER_PATH)
+        self.docString = checksParentUpdater.docString
+        
+        self._createDirs()
+        self._installAsDefault()
+        self._createRevisionContents()
+        
+        self.targetDir = os.path.dirname(os.path.dirname(self.CHECK_INSTALLER_PATH))
+        self._createDocumentation()
+        
+        self.applicationName = 'checks'
+        self._publishDocumentation()
+        
+    #---------------------------------------------------------------------------
+    
+    def _createDirs(self):
+        
+        if os.path.isdir(self.targetDir): 
+            raise InstallerException('Current revision exists already.')
+        else:
+            os.makedirs(self.targetDir)
+            
+    #---------------------------------------------------------------------------
+    
+    def _createRevisionContents(self):
+
+        print 'Creating a revision content in: "%s"' % self.targetDir
+        
+        stdout, _ = utils.runSubprocess('%s -copy %s' % (self.CHECK_INSTALLER_PATH, self.targetDir))
+        
+        print stdout
+
+    #---------------------------------------------------------------------------
+    
+    def _installAsDefault(self):
+        
+        print 'Releasing to the productive version'
+        
+        defaultDir = os.path.join(self.PRODUCTIVE_VERSION_HOME, 'default')
+        
+        if os.path.islink(defaultDir):
+            os.unlink(defaultDir)
+        os.symlink(self.revision, defaultDir)
+         
+    #---------------------------------------------------------------------------
+         
+    def updateForInstallation(self):
+         
+        ''' This is a workaround for the proper ANSA check installation
+        based check wrap to the one ansaChecksPlistUpdater tool. '''
+        
+        dst = os.path.join(self.CHECK_INSTALLER_CHECK_PATH,
+            os.path.basename(self.parentInstaller.mainModuleItem.sourceMainPath)) 
+        
+        if os.path.isfile(dst):
+            os.remove(dst)
+        
+        shutil.copy(self.parentInstaller.mainModuleItem.sourceMainPath,
+            dst)
+                
+    
 #==============================================================================
 @utils.registerClass
 class InstallTypeMeta(BaseInstallType):
@@ -610,6 +720,7 @@ class VersionItem(BaseInstallerProcedureItem):
         self.checker._checkEmptyParam('commitMessage', 'Commit message')
         self.checker._checkNewRevisionFiles()
         self.checker._checkDocStringUpdate()
+        self.checker._checkAnsaCheckNewTag()
     
     #---------------------------------------------------------------------------
     
@@ -632,6 +743,14 @@ class VersionItem(BaseInstallerProcedureItem):
         else:
             return ''
     
+    
+    #---------------------------------------------------------------------------
+         
+    def updateForInstallation(self):
+        
+        # add a file automatically in case of an ANSA check
+        if self.parentInstaller.procedureItems[InstallationSetupItem.NAME].installTypeItem.NAME == BaseInstallType.TYPE_ANSA_CHECK:
+            self.filesToAdd.append(self.parentInstaller.mainModuleItem.sourceMainPath)
     
 #=============================================================================
 
@@ -710,6 +829,34 @@ class BaseInstallItemChecker(object):
             else:
                 message = 'Documentation string unchanged.'
                 self.report.append([self.CHECK_TYPE_OK, message])
+    
+    #---------------------------------------------------------------------------
+    
+    def _checkAnsaCheckScript(self):
+                
+        if self.installItem.parentInstaller.mainModuleItem.checkAnsaCheckParametersPresence():
+            message = '"checkDescription" present in the check file ok.'
+            self.report.append([self.CHECK_TYPE_OK, message])
+        else:
+            message = 'There is no "checkDescription" present in the check file!'
+            self.report.append([self.CHECK_TYPE_CRITICAL, message])
+            self.status += self.CHECK_TYPE_CRITICAL
+    
+    #---------------------------------------------------------------------------
+    
+    def _checkAnsaCheckNewTag(self):
+        
+        if self.installItem.parentInstaller.getCurrentInstallType() == BaseInstallType.TYPE_ANSA_CHECK:
+            
+            tagName = self.installItem.tagName
+            tagList = self.installItem.tagList
+            if tagName in tagList:
+                message = 'You have to create a new version in order to add a new ANSA check!'
+                self.report.append([self.CHECK_TYPE_CRITICAL, message])
+                self.status += self.CHECK_TYPE_CRITICAL
+            else:
+                message = 'New version check ok.'
+                self.report.append([self.CHECK_TYPE_OK, message])  
             
     #---------------------------------------------------------------------------
     
@@ -754,7 +901,7 @@ class MainModuleItem(object):
     
         self._parse()
         self._findDocString()
-                
+                             
     #---------------------------------------------------------------------------
     
     def _parse(self):
@@ -889,7 +1036,19 @@ class MainModuleItem(object):
         fo = open(self.sourceMainPath, 'wt')
         for line in lines:
             fo.write('%s\n' % line)
-        fo.close() 
+        fo.close()
+    
+    #---------------------------------------------------------------------------
+    
+    def checkAnsaCheckParametersPresence(self):
+        
+        for line in self.lines:
+            parts = line.split()
+            if len(parts) > 0:
+                if parts[0] == 'checkDescription':
+                    return True
+        
+        return False 
                 
         
 #=============================================================================

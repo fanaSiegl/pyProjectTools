@@ -450,9 +450,11 @@ class ExecConfigPageWidget(BaseInstallerPageWidget):
     
     def _selectSourcePyProject(self):
         
+        installationItem = self.executableStackedWidget.currentWidget().installationItem
+        
         fileName = QtGui.QFileDialog.getOpenFileName(self.mainWindow,
             'Select pyProject source', self.parentApplication.workDir,
-            filter = "pyProject main.py (main.py)")
+            filter = installationItem.SOURCE_FILE_FILTER)
          
         if not fileName:
             return
@@ -470,9 +472,12 @@ class ExecConfigPageWidget(BaseInstallerPageWidget):
     
     def _setupPyProjectName(self, fileName):
         
-        # set project name automatically
+        ''' Set project name automatically based on installation type '''
+        
+        installationItem = self.executableStackedWidget.currentWidget().installationItem
+        
         self.sourcePyProjectNameLineEdit.setText(
-            os.path.basename(os.path.dirname(os.path.dirname(str(fileName)))))
+            installationItem.getProjectNameFromSourceFile(fileName))
         
     #--------------------------------------------------------------------------
     
@@ -483,8 +488,8 @@ class ExecConfigPageWidget(BaseInstallerPageWidget):
         
         if not os.path.exists(sourceMainPath):
             raise ModuleFileNameException('Given file does not exit!')
-        elif os.path.basename(sourceMainPath) != 'main.py':
-            raise ModuleFileNameException('Given file must be a pyProject generated creator.py!')
+#         elif os.path.basename(sourceMainPath) != 'main.py':
+#             raise ModuleFileNameException('Given file must be a pyProject generated creator.py!')
         
         self.hasFinished.emit()
     
@@ -604,6 +609,15 @@ class DocumentationPageWidget(BaseInstallerPageWidget):
         self.documentationTextEdit.clear()
         self.setDocString(self.installer.mainModuleItem.docString)
         
+        # deactivate non relevant parameters 
+        if self.installer.getCurrentInstallType() == bi.BaseInstallType.TYPE_ANSA_CHECK:
+                         
+            self.docuGroupCombobox.setEnabled(False)
+            self.docuDescription.setEnabled(False)
+        else:
+            self.docuGroupCombobox.setEnabled(True)
+            self.docuDescription.setEnabled(True)
+        
         self.hasFinished.emit()
 
     #--------------------------------------------------------------------------
@@ -712,7 +726,7 @@ class VersionPageWidget(BaseInstallerPageWidget):
 #             tagList.append(parts[0])
         
         self.installationItem.setCurrentTagList(
-            os.path.dirname(self.parentApplication.sourceMainPath))
+            os.path.dirname(self.parentApplication.installer.mainModulePath))
         
         self.tagCombobox.setupTagList(self.installationItem.tagList)
     
@@ -743,7 +757,7 @@ class VersionPageWidget(BaseInstallerPageWidget):
         
         stdout, stderr = utils.runSubprocess('git status',
             cwd=os.path.dirname(
-            os.path.dirname(self.parentApplication.sourceMainPath)))
+            os.path.dirname(self.parentApplication.installer.mainModulePath)))
                 
         untrackedFiles = list()
         untrackedBlock = False

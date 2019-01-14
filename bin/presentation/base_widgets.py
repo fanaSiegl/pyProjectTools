@@ -585,6 +585,33 @@ class ExecConfigAnsaButtonWidget(BaseConfigExecutableWidget):
         if len(projectName) > 0: 
             self.buttonNameLineEdit.clear()
             self.buttonNameLineEdit.setText(projectName)
+
+#==============================================================================
+@utils.registerClass
+class ExecConfigAnsaCheckWidget(BaseConfigExecutableWidget):
+    
+    NAME = bi.BaseInstallType.TYPE_ANSA_CHECK
+    
+    #---------------------------------------------------------------------------
+    
+    def _setupWidgets(self):
+        
+        self.setLayout(QtGui.QVBoxLayout())
+                
+        self.buttonGroupLineEdit = QtGui.QLineEdit()
+        
+        installDescription = '''To add a new check after installation you have to
+search for it in the ANSA Checks Manager and add it to the template.
+Mind that only checks compatible with the current active DECK are listed.'''
+        
+        self.layout().addWidget(QtGui.QLabel(installDescription))
+
+    #---------------------------------------------------------------------------
+    
+    def setExecSettingsFromMainModule(self):
+                        
+        print self.installer.mainModuleItem.applicationName
+        
         
 #==============================================================================
 @utils.registerClass

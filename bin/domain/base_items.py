@@ -80,6 +80,12 @@ class BaseInstallType(BaseParamItem):
     
     #---------------------------------------------------------------------------
     
+    def getTargetDir(self):
+        
+        return self.PRODUCTIVE_VERSION_HOME
+    
+    #---------------------------------------------------------------------------
+    
     def getProjectNameFromSourceFile(self, fileName):
         
         return os.path.basename(os.path.dirname(os.path.dirname(str(fileName))))
@@ -96,8 +102,8 @@ class BaseInstallType(BaseParamItem):
         print 'Installing: %s' % self.NAME
         
         self.pyProjectPath = pyProjectPath
-        self.targetDir = os.path.join(self.PRODUCTIVE_VERSION_HOME, applicationName, revision)
-        self.applicationPath = os.path.join(self.PRODUCTIVE_VERSION_HOME, applicationName)
+        self.targetDir = os.path.join(self.getTargetDir(), applicationName, revision)
+        self.applicationPath = os.path.join(self.getTargetDir(), applicationName)
         self.revision = revision
         self.applicationName = applicationName
         self.docuGroup = docuGroup
@@ -161,8 +167,9 @@ MODIFIED = ${lastModified}'''
         shutil.rmtree(repositoryPath)
             
         buildScript = os.path.join(self.targetDir, 'build.py')
-        os.remove(buildScript)
-    
+        
+        if os.path.isfile(buildScript):
+            os.remove(buildScript)
         
     #---------------------------------------------------------------------------
     
@@ -342,7 +349,7 @@ Revision history graph::
 class InstallTypeExecutable(BaseInstallType):
 
     NAME = BaseInstallType.TYPE_EXECUTABLE
-    PRODUCTIVE_VERSION_HOME = '/data/fem/+software/SKRIPTY/tools/python'
+    PRODUCTIVE_VERSION_HOME = '/data/fem/+software/SKRIPTY/tools/%s'
     REPOS_PATH = '/data/fem/+software/SKRIPTY/tools/repos'
     PRODUCTIVE_VERSION_BIN = '/data/fem/+software/SKRIPTY/tools/bin'
 
@@ -350,7 +357,14 @@ class InstallTypeExecutable(BaseInstallType):
         super(InstallTypeExecutable, self).__init__(parentInstaller)
         
         self.executableName = ''
+        self.codeLanguage = ''
+
+    #---------------------------------------------------------------------------
     
+    def getTargetDir(self):
+        
+        return self.PRODUCTIVE_VERSION_HOME % self.codeLanguage
+        
     #---------------------------------------------------------------------------
     
     def addChecks(self):
@@ -456,7 +470,7 @@ class InstallTypeAnsaCheck(BaseInstallType):
         
         print 'Installing: %s' % self.NAME
         
-        self.targetDir = os.path.join(self.PRODUCTIVE_VERSION_HOME, revision)
+        self.targetDir = os.path.join(self.getTargetDir(), revision)
         self.revision = revision
         self.docuGroup = docuGroup
         self.docuDescription = docuDescription
@@ -501,7 +515,7 @@ class InstallTypeAnsaCheck(BaseInstallType):
         
         print 'Releasing to the productive version'
         
-        defaultDir = os.path.join(self.PRODUCTIVE_VERSION_HOME, 'default')
+        defaultDir = os.path.join(self.getTargetDir(), 'default')
         
         if os.path.islink(defaultDir):
             os.unlink(defaultDir)

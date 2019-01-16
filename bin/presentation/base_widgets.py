@@ -385,6 +385,45 @@ class ProjectTagComboBox(BaseExtendableComboBox):
 
 #==============================================================================
 
+class CodeTypeComboBox(BaseExtendableComboBox):
+    
+    NEW_ITEM_TEXT = '+ new language'
+    NEW_ITEM_WINDOW_LABEL = 'New language'
+    NEW_ITEM_DESCRIPTION = 'Select new programming language group.'
+    
+    DFT_LANGUAGE = 'python'    
+    TOOL_ROOT = '/data/fem/+software/SKRIPTY/tools'
+    IGNORE_ROOT_DIRS = ['bin', 'repos']
+
+    #---------------------------------------------------------------------------
+    
+    def _setupItems(self):
+                
+        for language in self._getListOfAvailableLanguages():
+            self.addItem(language)
+        
+        self.DFT_INDEX = self.findText(self.DFT_LANGUAGE)
+        
+        self.addItem(self.NEW_ITEM_TEXT)
+                
+        self.setCurrentIndex(self.DFT_INDEX)
+    
+    #---------------------------------------------------------------------------
+    
+    def _getListOfAvailableLanguages(self):
+        
+        languages = list()
+        
+        for itemName in os.listdir(self.TOOL_ROOT):
+            if (os.path.isdir(os.path.join(self.TOOL_ROOT, itemName)) and  
+                itemName not in self.IGNORE_ROOT_DIRS):
+                
+                languages.append(itemName)
+        return languages 
+    
+            
+#==============================================================================
+
 class BaseItemParamSyncWidget(QtGui.QWidget):
 
     #---------------------------------------------------------------------------
@@ -491,16 +530,18 @@ class ExecConfigExecutableWidget(BaseConfigExecutableWidget):
         self.layout().addWidget(QtGui.QLabel('Executable name'), 0, 0)
         self.layout().addWidget(self.executableLineEdit, 0, 1)
         
-#         self.execFunctionNameComboBox = QtGui.QComboBox()
-#         
-#         self.layout().addWidget(QtGui.QLabel('Function name'), 1, 0)
-#         self.layout().addWidget(self.execFunctionNameComboBox, 1, 1)
+        self.codeLanguageComboBox = CodeTypeComboBox(
+            self.parentStack.mainWindow)
+         
+        self.layout().addWidget(QtGui.QLabel('Programming language'), 1, 0)
+        self.layout().addWidget(self.codeLanguageComboBox, 1, 1)
         
     #---------------------------------------------------------------------------
     
     def _setupConnections(self):
         
         self._connectLineEditWidget(self.executableLineEdit, 'executableName')
+        self._connectComboBoxWidget(self.codeLanguageComboBox, 'codeLanguage')
     
     #---------------------------------------------------------------------------
     

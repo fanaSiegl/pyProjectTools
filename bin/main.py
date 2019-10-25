@@ -21,12 +21,19 @@ pyProjectInstaller
   
 '''
 
+#===============================================================================
+
+APPLICATION_NAME = 'pyProjectInstaller'
+DOCUMENTATON_GROUP = 'development tools'
+DOCUMENTATON_DESCRIPTION = 'script for new python project installation.'
+
+#===============================================================================
+
 import os
 import sys
 import traceback
 import getpass
 import socket
-import imp
 
 from PyQt4 import QtCore, QtGui
 
@@ -130,7 +137,7 @@ class InstallerApplication(QtGui.QApplication):
         gitConfigPath = os.path.join(userHome, '.gitconfig')
         
         if os.path.exists(gitConfigPath):
-            print 'git config file found: "gitConfigPath"'
+            print('git config file found: "gitConfigPath"')
             return
         
         QtGui.QMessageBox.critical(

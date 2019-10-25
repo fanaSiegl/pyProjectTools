@@ -8,13 +8,12 @@ import sys
 import re
 import shutil
 
-from PyQt4 import QtCore
-from PyQt4 import QtGui
+from PyQt4 import QtCore, QtGui
 # from PyQt4 import QtWebKit
 
 from domain import utils
 from domain import base_items as bi
-import base_widgets as bw
+from presentation import base_widgets as bw
 
 #===============================================================================
 
@@ -40,72 +39,30 @@ class DocuPreviewDialog(object):
 
    '''
         
-        src = '/data/fem/+software/SKRIPTY/tools/python/newPyProject/default/res/new_project_structure/doc'
-        dst = '/tmp/sphinxTempDoc'
+        src = os.path.join(utils.PATH_RES, 'doc_preview')
+        dst = os.path.join(utils.getInstallTypePaths()['INSTALLATION_PATHS_BASE']['DOCUMENTATON_PATH_TEMP'], 'sphinx')
         
-        sourceSphinxPath = os.path.join(dst, 'sphinx','source')
+        sourceSphinxPath = os.path.join(dst,'source')
         
         # initiate
         if os.path.isdir(dst):
             shutil.rmtree(dst)
+        
         shutil.copytree(src, dst)
-        
-        if not os.path.isdir(sourceSphinxPath):
-            os.makedirs(sourceSphinxPath)
-        
+                
         fo = open(os.path.join(sourceSphinxPath, 'index.rst'), 'wt')
         fo.write(TEMPLATE % docString)
         fo.close()
         
-        # copy conf
-        sourceConfPath = os.path.join(utils.PATH_RES, 'conf.py')
-        destConfPath = os.path.join(sourceSphinxPath, 'conf.py')
-        shutil.copy(
-            sourceConfPath,
-            destConfPath)
-        
-        stdout, stderr = utils.runSubprocess(os.path.join(dst, 'sphinx', 'buildHtmlDoc.py') ,
-            cwd = os.path.dirname(sourceSphinxPath))
-        
-        address = os.path.join(dst, 'sphinx','build', 'html', 'index.html')   
+        command = 'sphinx-build -b html -d %s %s %s' % (
+            os.path.join(dst, 'build', 'doctrees'),
+            sourceSphinxPath, os.path.join(dst, 'build', 'html'))
+        utils.runSubprocess(command)
+                
+        address = os.path.join(dst, 'build', 'html', 'index.html')   
         
         utils.runSubprocess('firefox %s &' % address)
     
-#===============================================================================
-
-# class DocuPreviewDialog2(QtGui.QDialog):
-# 
-#     WIDTH = 1024
-#     HEIGHT = 768
-#     
-#     def __init__(self, parentApplication, sourceSphinxPath):
-#         super(DocuPreviewDialog, self).__init__()
-#         
-#         self.parentApplication = parentApplication
-#         self.address = os.path.join(sourceSphinxPath, 'build', 'html', 'index.html')
-#         
-#         self._setWindowGeometry()
-#         
-#         self.setLayout(QtGui.QVBoxLayout())
-#         
-#         self.browser = QtWebKit.QWebView()
-#         self.browser.load(QtCore.QUrl(self.address))
-# 
-#         self.layout().addWidget(self.browser)
-#         
-#     #---------------------------------------------------------------------------
-# 
-#     def _setWindowGeometry(self):
-#         
-#         self.setWindowTitle('%s (%s)' % (
-#             self.parentApplication.APPLICATION_NAME, self.parentApplication.revision))
-#         
-# #         self.setWindowIcon(QtGui.QIcon(os.path.join(utils.PATH_ICONS, 'view-web-browser-dom-tree.png')))
-# 
-#         self.resize(self.WIDTH, self.HEIGHT)
-#         self.move(QtGui.QApplication.desktop().screen().rect().center()- self.rect().center())
-
-
 #==============================================================================
 
 class NewRevisionDialog(QtGui.QDialog):

@@ -21,7 +21,7 @@ from domain import utils
 
 revision, modifiedBy, lastModified = utils.getVersionInfo()
 
-TOOL_NAME = 'newPyProject'
+TOOL_NAME = 'pyProjectInstaller'
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -35,7 +35,7 @@ TOOL_NAME = 'newPyProject'
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.pngmath', 'sphinx.ext.ifconfig',
+extensions = ['sphinx.ext.autodoc', 'sphinx.ext.ifconfig',
     'sphinx.ext.viewcode']
 
 # Add any paths that contain templates here, relative to this directory.
@@ -164,7 +164,7 @@ html_static_path = []
 #html_show_sphinx = True
 
 # If true, "(C) Copyright ..." is shown in the HTML footer. Default is True.
-#html_show_copyright = True
+html_show_copyright = True
 
 # If true, an OpenSearch description file will be output, and all pages will
 # contain a <link> tag referring to it.  The value of this option must be the

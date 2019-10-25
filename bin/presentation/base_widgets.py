@@ -10,7 +10,7 @@ from PyQt4 import QtCore, QtGui
 from domain import utils
 from domain import base_items as bi
 
-import dialogs
+from presentation import dialogs
 
 #=============================================================================
 
@@ -32,206 +32,6 @@ class BaseListWidgetItem(QtGui.QListWidgetItem):
         
         self.setText(self.name)
         
-         
-#===============================================================================
-# 
-# class CentralWidget(QtGui.QWidget):
-#     
-#     def __init__(self, mainWindow):
-#         super(CentralWidget, self).__init__()
-#         
-#         self.mainWindow = mainWindow 
-#         self.parentApplication = mainWindow.parentApplication
-#         
-#         self.execConfigWidgets = dict()
-#         
-#         self._setupWidgets()
-#     
-#     #--------------------------------------------------------------------------
-# 
-#     def _setupWidgets(self):
-#                         
-#         self.layout = QtGui.QVBoxLayout()
-#         self.setLayout(self.layout)
-#                 
-#         # source project
-#         groupSource = QtGui.QGroupBox('Source pyProject')
-#         groupSource.setLayout(QtGui.QVBoxLayout())
-#         self.layout.addWidget(groupSource)
-#         
-#         # install type
-#         self.installTypeComboBox = QtGui.QComboBox()
-#         
-#         layout = QtGui.QHBoxLayout()
-#         layout.addWidget(QtGui.QLabel('Install type'))
-#         layout.addWidget(self.installTypeComboBox)
-#         groupSource.layout().addLayout(layout)
-#         
-#         # source file 
-#         self.sourcePyProjectLineEdit = QtGui.QLineEdit()
-#         self.browseButton = QtGui.QPushButton('Browse')
-#         
-#         layout = QtGui.QHBoxLayout()
-#         layout.addWidget(QtGui.QLabel('Source pyProject'))
-#         layout.addWidget(self.sourcePyProjectLineEdit)
-#         layout.addWidget(self.browseButton)
-#         groupSource.layout().addLayout(layout)
-#         
-#         # documentation
-#         groupDoc = QtGui.QGroupBox('Documentation')
-#         groupDoc.setLayout(QtGui.QVBoxLayout())
-#         self.layout.addWidget(groupDoc)
-#         
-#         layout = QtGui.QGridLayout()
-#         groupDoc.layout().addLayout(layout)
-#         
-#         # documentation group
-#         self.docuGroupCombobox = DocumentationGroupComboBox(self)
-#          
-#         layout.addWidget(QtGui.QLabel('Tool group'), 0, 0)
-#         layout.addWidget(self.docuGroupCombobox, 0, 1)
-#         
-#         # documentation description
-#         self.docuDescription = QtGui.QLineEdit()
-#         
-#         layout.addWidget(QtGui.QLabel('Tool description'), 1, 0)
-#         layout.addWidget(self.docuDescription, 1, 1)
-#         
-#         # documentation string
-#         self.documentationTextEdit = QtGui.QTextEdit()
-#         self.documentationTextEdit.setReadOnly(True)
-#         
-#         font = QtGui.QFont()
-#         font.setFamily("Courier New")
-#         self.documentationTextEdit.setFont(font)
-#         
-#         groupDoc.layout().addWidget(self.documentationTextEdit)
-#         
-#         layout = QtGui.QHBoxLayout()
-#         layout.addStretch()
-#         
-#         # enable editing
-#         self.editDocStringButton = QtGui.QPushButton('Edit')
-#                 
-#         layout.addWidget(self.editDocStringButton)
-#         
-#         # default documentation string
-#         self.dftDocStringButton = QtGui.QPushButton('Default doc')
-#         self.dftDocStringButton.setEnabled(False)
-#         
-#         layout.addWidget(self.dftDocStringButton)
-#         
-#         # preview
-#         self.previewButton = QtGui.QPushButton('Preview')
-#                 
-#         layout.addWidget(self.previewButton)
-#         groupDoc.layout().addLayout(layout)
-#         
-#         # execution
-#         groupExec = QtGui.QGroupBox('Execution settings')
-#         groupExec.setLayout(QtGui.QVBoxLayout())
-#         self.layout.addWidget(groupExec)
-#         
-#         self.executableStackedWidget = QtGui.QStackedWidget()
-#         
-#         groupExec.layout().addWidget(self.executableStackedWidget)
-#         
-#         
-#         for execConfigWidget in INSTALL_CONFIG_WIDGETS.values():
-#             currentWidget = execConfigWidget(self)
-#             
-#             self.executableStackedWidget.addWidget(currentWidget)
-#             
-#             # register added widget for easier switching
-#             self.execConfigWidgets[
-#                 currentWidget.NAME] = self.executableStackedWidget.indexOf(currentWidget)
-#                 
-#         # installation
-#         groupInstall = QtGui.QGroupBox('Installation')
-#         groupInstall.setLayout(QtGui.QVBoxLayout())
-#         self.layout.addWidget(groupInstall)
-#         
-#         layout = QtGui.QGridLayout()
-#         groupInstall.layout().addLayout(layout)
-#                 
-#         # revision
-#         self.tagCombobox = ProjectTagComboBox(self)
-#          
-#         layout.addWidget(QtGui.QLabel('Select version'), 0, 0)
-#         layout.addWidget(self.tagCombobox, 0, 1)
-# 
-# 
-#         # buttons
-#         frame = QtGui.QFrame()
-#         frame.setFrameShape(QtGui.QFrame.HLine)
-#         self.layout.addWidget(frame)
-#         
-#         self.buttonBox = QtGui.QDialogButtonBox()
-#         self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Cancel|QtGui.QDialogButtonBox.Ok)
-#         
-#         self.installButton = self.buttonBox.button(QtGui.QDialogButtonBox.Ok)
-#         self.closeButton = self.buttonBox.button(QtGui.QDialogButtonBox.Cancel)
-#         
-#         self.layout.addWidget(self.buttonBox)
-#         
-#         # setup user info
-#         userInfo = QtGui.QLabel('Current user: %s@%s' % (
-#         self.parentApplication.userName, self.parentApplication.machine))
-#         
-#         self.buttonBox.layout().insertWidget(0, userInfo)
-#     
-#     #--------------------------------------------------------------------------
-# 
-#     def setDocuDescription(self, text):
-#         
-#         if len(text) > 0:
-#             self.docuDescription.clear()
-#             self.docuDescription.setText(text)
-#         
-#     #--------------------------------------------------------------------------
-# 
-#     def setDocString(self, text):
-#         
-#         if len(self.documentationTextEdit.toPlainText()) > 0:
-#             answer = QtGui.QMessageBox.question(
-#                 self.mainWindow, '%s' % self.parentApplication.APPLICATION_NAME,
-#                 'Current documentation string will be deleted. Do you want to continue?',
-#                 QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)
-#             if answer == QtGui.QMessageBox.No:
-#                 return
-#         
-#         self.documentationTextEdit.clear()
-#         self.documentationTextEdit.setText(text)
-#     
-#     #--------------------------------------------------------------------------
-#     
-#     def getDocString(self):
-#         
-#         return str(self.documentationTextEdit.toPlainText())
-#     
-#     #--------------------------------------------------------------------------
-#     
-#     def setExecSettingsFromMainModule(self, mainModule):
-#         
-#         for execConfigWidgetNo in self.execConfigWidgets.values():
-#             
-#             execConfigWidget = self.executableStackedWidget.widget(execConfigWidgetNo)
-#             execConfigWidget.setExecSettingsFromMainModule(mainModule)
-#     
-#     #--------------------------------------------------------------------------
-#     
-#     def enableDocStringEditing(self):
-#         
-#         answer = QtGui.QMessageBox.question(
-#             self.mainWindow, '%s' % self.parentApplication.APPLICATION_NAME,
-#             'When you edit the documentation string you will have to create a new program version. \nDo you want to continue?',
-#             QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)
-#         if answer == QtGui.QMessageBox.No:
-#             return
-#         
-#         self.documentationTextEdit.setReadOnly(False)
-#         self.dftDocStringButton.setEnabled(True)
-            
 #==============================================================================
 
 class BaseExtendableComboBox(QtGui.QComboBox):
@@ -291,7 +91,8 @@ class BaseExtendableComboBox(QtGui.QComboBox):
     def _createNewItem(self):
         
         newGroupName, ok = QtGui.QInputDialog.getText(self.mainWindow,
-            self.NEW_ITEM_WINDOW_LABEL, self.NEW_ITEM_DESCRIPTION)
+            self.NEW_ITEM_WINDOW_LABEL, self.NEW_ITEM_DESCRIPTION,
+            text=self._getDefaultNewItemText())
             
         if not ok:
             self.setCurrentIndex(self.DFT_INDEX)
@@ -312,7 +113,12 @@ class BaseExtendableComboBox(QtGui.QComboBox):
         self.setCurrentIndex(self.DFT_INDEX)
         
         self.blockSignals(False)
+    
+    #---------------------------------------------------------------------------
+    
+    def _getDefaultNewItemText(self):
         
+        return ''    
         
 #==============================================================================
 
@@ -361,7 +167,28 @@ class ProjectTagComboBox(BaseExtendableComboBox):
         for tag in tagList:
             self.addNewItem(tag)
         
+    #---------------------------------------------------------------------------
+    
+    def _getDefaultNewItemText(self):
         
+        versions = list()
+        for itemIndex in range(self.count()):
+            itemText = self.itemText(itemIndex)
+            if itemText.startswith('V'):
+                versions.append(itemText)
+        
+        if len(versions) == 0:
+            return 'V.0.0.1'
+            
+        try:
+            lastVersion = sorted(versions)[-1]
+            parts = lastVersion.split('.')
+            parts[-1] = str(int(parts[-1]) + 1) 
+            nextVersion = '.'.join(parts) 
+        except:
+            nextVersion = ''
+        
+        return nextVersion
         
 #             super(ProjectTagComboBox, self).addNewItem(tag)
     
@@ -392,7 +219,7 @@ class CodeTypeComboBox(BaseExtendableComboBox):
     NEW_ITEM_DESCRIPTION = 'Select new programming language group.'
     
     DFT_LANGUAGE = 'python'    
-    TOOL_ROOT = '/data/fem/+software/SKRIPTY/tools'
+    TOOL_ROOT = utils.getInstallTypePaths()['INSTALLATION_PATHS_TYPE_EXECUTABLE']['PRODUCTIVE_VERSION_HOME']#'/data/fem/+software/SKRIPTY/tools'
     IGNORE_ROOT_DIRS = ['bin', 'repos']
 
     #---------------------------------------------------------------------------
@@ -598,7 +425,7 @@ class ExecConfigAnsaButtonWidget(BaseConfigExecutableWidget):
         buttonExecFunctions = self.installer.mainModuleItem.getListOfAnsaButtonDecoratedFunctions()
         if len(buttonExecFunctions) > 0:
             for buttonExecFunction in buttonExecFunctions:
-                for functionName, settings in buttonExecFunction.iteritems():
+                for functionName, settings in buttonExecFunction.items():
                     
                     self.buttonGroupLineEdit.setText(settings[0])
                     self.buttonNameLineEdit.setText(settings[1])
@@ -650,8 +477,8 @@ Mind that only checks compatible with the current active DECK are listed.'''
     #---------------------------------------------------------------------------
     
     def setExecSettingsFromMainModule(self):
-                        
-        print self.installer.mainModuleItem.applicationName
+        pass                
+#         print(self.installer.mainModuleItem.applicationName)
         
         
 #==============================================================================

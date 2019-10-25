@@ -11,8 +11,8 @@ from PyQt4 import QtCore, QtGui
 
 from domain import utils
 from domain import base_items as bi
-import dialogs
-import base_widgets as bw
+from presentation import dialogs
+from presentation import base_widgets as bw
 
 #===============================================================================
 
@@ -345,6 +345,7 @@ class ExecConfigPageWidget(BaseInstallerPageWidget):
     NAME = bi.InstallationSetupItem.NAME
     DESCRIPTION = 'Select the installation type and a name of the executable.'
     PAGE_NO = 0
+    DFT_INSTALLATION_TYPE = bi.BaseInstallType.TYPE_EXECUTABLE
     
     mainModuleSet = QtCore.pyqtSignal(str)
     
@@ -409,7 +410,14 @@ class ExecConfigPageWidget(BaseInstallerPageWidget):
     
     def _initiateContent(self):
         
-        self.installTypeComboBox.addItems(bi.INSTALL_TYPES.keys())
+        self.installTypeComboBox.addItems(sorted(bi.INSTALL_TYPES.keys()))
+        
+        # set default installation type
+        self.installTypeComboBox.setCurrentIndex(
+            self.installTypeComboBox.findText(self.DFT_INSTALLATION_TYPE))
+        
+        self.executableStackedWidget.setCurrentIndex(
+            self.execConfigWidgets[self.DFT_INSTALLATION_TYPE])
         
         # initiate install type
         execConfigType = self.executableStackedWidget.currentWidget()
@@ -484,10 +492,10 @@ class ExecConfigPageWidget(BaseInstallerPageWidget):
     def _checkMainModuleFileName(self, sourceMainPath):
                 
         if len(sourceMainPath) == 0:
-            raise ModuleFileNameException('Given file not given!')
+            raise(ModuleFileNameException('Given file not given!'))
         
         if not os.path.exists(sourceMainPath):
-            raise ModuleFileNameException('Given file does not exit!')
+            raise(ModuleFileNameException('Given file does not exit!'))
 #         elif os.path.basename(sourceMainPath) != 'main.py':
 #             raise ModuleFileNameException('Given file must be a pyProject generated creator.py!')
         

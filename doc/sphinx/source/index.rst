@@ -8,7 +8,7 @@ newPyProject documentation
 .. toctree::
    :maxdepth: 2
    
-.. automodule:: installer
+.. automodule:: main
 
 
 Revision history

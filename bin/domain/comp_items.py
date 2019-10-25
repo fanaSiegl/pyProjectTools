@@ -30,7 +30,7 @@ class Installer(object):
     
     def _initialiseInstallationItems(self):
         
-        for itemName, installItem in bi.INSTALLER_PROCEDURE_ITEMS.iteritems():
+        for itemName, installItem in bi.INSTALLER_PROCEDURE_ITEMS.items():
             self.procedureItems[itemName] = installItem(self)
     
     #---------------------------------------------------------------------------
@@ -94,7 +94,7 @@ class Installer(object):
                 
         # add files
         for newFileName in newFileList:
-            print 'Adding file to repository: %s' % newFileName
+            print('Adding file to repository: %s' % newFileName)
             utils.runSubprocess('git add %s' % newFileName, cwd=os.path.dirname(
                 os.path.dirname(self.mainModulePath)))
         
@@ -110,7 +110,7 @@ class Installer(object):
     
     def _createMasterRepository(self):
         
-        print 'Master repository synchronisation'
+        print('Master repository synchronisation')
         
         reposPath = self.procedureItems[bi.InstallationSetupItem.NAME].installTypeItem.REPOS_PATH
         projectName = self.procedureItems[bi.InstallationSetupItem.NAME].projectName

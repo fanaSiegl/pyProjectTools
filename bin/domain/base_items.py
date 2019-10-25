@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
 import os
@@ -35,7 +35,7 @@ class BaseParamItem(object):
     #---------------------------------------------------------------------------
     
     def setParamValue(self, paramName, value):
-#         print self, paramName, value
+        
         setattr(self, paramName, value)
     
     #---------------------------------------------------------------------------
@@ -63,13 +63,15 @@ class BaseInstallType(BaseParamItem):
     TYPE_ANSA_BUTTON = 'ANSA user script button'
     TYPE_META = 'META script'
     TYPE_ANSA_CHECK = 'ANSA check'
-        
+    
+    INSTALL_PATHS = utils.getInstallTypePaths()['INSTALLATION_PATHS_BASE']
+    
     EXECUTABLE = 'bin/main.py'
-    PRODUCTIVE_VERSION_BIN = '/data/fem/+software/SKRIPTY/tools/bin'
-    PRODUCTIVE_VERSION_HOME = '/data/fem/+software/SKRIPTY/tools/python'
-    REPOS_PATH = '/data/fem/+software/SKRIPTY/tools/repos'
+    PRODUCTIVE_VERSION_BIN = INSTALL_PATHS['PRODUCTIVE_VERSION_BIN']#'/data/fem/+software/SKRIPTY/tools/bin'
+    PRODUCTIVE_VERSION_HOME = INSTALL_PATHS['PRODUCTIVE_VERSION_HOME']#'/data/fem/+software/SKRIPTY/tools/python'
+    REPOS_PATH = INSTALL_PATHS['REPOS_PATH']#'/data/fem/+software/SKRIPTY/tools/repos'
     VERSION_FILE = 'ini/version.ini'
-    DOCUMENTATON_PATH = '/data/fem/+software/SKRIPTY/tools/python/tool_documentation/default'
+    DOCUMENTATON_PATH = INSTALL_PATHS['DOCUMENTATON_PATH']#'/data/fem/+software/SKRIPTY/tools/python/tool_documentation/default'
     
     SOURCE_FILE_FILTER = 'pyProject main.py (main.py)'
     
@@ -99,7 +101,7 @@ class BaseInstallType(BaseParamItem):
     
     def install(self, pyProjectPath, revision, applicationName, docuGroup, docuDescription, docString):
         
-        print 'Installing: %s' % self.NAME
+        print('Installing: %s' % self.NAME)
         
         self.pyProjectPath = pyProjectPath
         self.targetDir = os.path.join(self.getTargetDir(), applicationName, revision)
@@ -123,7 +125,7 @@ class BaseInstallType(BaseParamItem):
     
     def _createVersionFile(self):
         
-        print 'Updating a version file'
+        print('Updating a version file')
         
         modifiedBy, lastModified = self._getRevisionInfo()
         
@@ -147,7 +149,7 @@ MODIFIED = ${lastModified}'''
     
     def _createRevisionContents(self):
         
-        print 'Creating a revision content in: "%s"' % self.targetDir
+        print('Creating a revision content in: "%s"' % self.targetDir)
         
         if os.path.isdir(self.targetDir): 
             raise InstallerException('Current revision exists already.')
@@ -161,7 +163,7 @@ MODIFIED = ${lastModified}'''
     
     def _cleanUp(self):
         
-        print 'Cleaning up files'
+        print('Cleaning up files')
         
         repositoryPath = os.path.join(self.targetDir, '.git')
         shutil.rmtree(repositoryPath)
@@ -175,7 +177,7 @@ MODIFIED = ${lastModified}'''
     
     def _getRevisionInfo(self):
         
-        print 'Gathering revision information'
+        print('Gathering revision information')
         
         output, _ = utils.runSubprocess('git log %s -n 1' % self.revision, self.pyProjectPath)
         
@@ -190,7 +192,7 @@ MODIFIED = ${lastModified}'''
     
     def _installAsDefault(self):
         
-        print 'Releasing to the productive version'
+        print('Releasing to the productive version')
         
         defaultDir = os.path.join(self.applicationPath, 'default')
         
@@ -200,40 +202,37 @@ MODIFIED = ${lastModified}'''
         
         symLink = os.path.join(self.PRODUCTIVE_VERSION_BIN, self.executableName)
         executable = os.path.join(defaultDir, self.EXECUTABLE)
+        
+        # delete existing bin link
         if os.path.islink(symLink):
             os.unlink(symLink)
-        os.symlink(executable, symLink)
-        
-        os.chmod(symLink, 0775)
+        elif os.path.isfile(symLink):
+            os.remove(symLink)
+                
+        # try to find python environment executable
+        envExecutable = utils.getEnvironmentExecutable(os.path.join(defaultDir, 'ini'))
+        if envExecutable is None:
+            os.symlink(executable, symLink)
+        else:
+            fo = open(symLink, 'wt')
+            fo.write('#!/usr/bin/bash\n')
+            fo.write('%s %s' % (envExecutable, executable))
+            fo.close()
+            
+        os.chmod(symLink, 0o775)
     
     #---------------------------------------------------------------------------
     
     def _createDocumentation(self):
         
-        print 'Creating local sphinx documentation'
+        print('Creating local sphinx documentation')
         
         SPHINX_DOC = os.path.join(self.targetDir, 'doc', 'sphinx')
         SPHINX_SOURCE = os.path.join(SPHINX_DOC, 'source')
         SPHINX_DOCTREES = os.path.join(SPHINX_DOC, 'build', 'doctrees')
         SPHINX_HTML = os.path.join(SPHINX_DOC, 'build', 'html')
-        SPHINX_BUILD = os.path.join(SPHINX_DOC, 'sphinx-build.py')
         GIT_REVISION_HISTORY = os.path.join(SPHINX_SOURCE, 'revision_history.rst')
-        
-#         # update index file
-#         newIndexLines = list()
-#         fi = open(os.path.join(SPHINX_SOURCE, 'index.rst'), 'rt')
-#         for line in fi.readlines():
-#             if line.startswith('.. automodule:: main'):
-#                 newIndexLines.append('\n%s\n' % self.docString)
-#             else:
-#                 newIndexLines.append(line)
-#         fi.close()
-#         
-#         fo = open(os.path.join(SPHINX_SOURCE, 'index.rst'), 'wt')
-#         for line in newIndexLines:
-#             fo.write(line)
-#         fo.close()
-        
+                
         # create revision history
         HEADER = '''
 Revision history
@@ -256,15 +255,14 @@ Revision history graph::
         fo.close()
         
         # create local documentation
-        utils.runSubprocess('python %s -b html -d %s %s %s' % (
-            SPHINX_BUILD, SPHINX_DOCTREES, SPHINX_SOURCE, SPHINX_HTML),
-            self.targetDir)
+        utils.runSubprocess('sphinx-build -b html -d %s %s %s' % (
+            SPHINX_DOCTREES, SPHINX_SOURCE, SPHINX_HTML))
     
     #---------------------------------------------------------------------------
     
     def _publishDocumentation(self):
         
-        print 'Updating tool documentation'
+        print('Updating tool documentation')
         
         SPHINX_LOCAL_DOC_SOURCE = os.path.join(self.targetDir, 'doc', 'sphinx', 'source')
     
@@ -314,32 +312,7 @@ Revision history graph::
         
         # update tool documentation
         updateScriptPath = os.path.join(self.DOCUMENTATON_PATH, 'buildHtmlDoc.py')
-        utils.runSubprocess(updateScriptPath)
-                
-#         SPHINX_DOC = os.path.join(self.targetDir, 'doc', 'sphinx')
-#         SPHINX_HTML = os.path.join(SPHINX_DOC, 'build', 'html')
-#         
-#         SPHINX_INDEX = os.path.join(SPHINX_HTML, 'index.html')
-#         
-#         # copy to tool documentation
-#         docFileName = os.path.join(self.DOCUMENTATON_PATH, 'source',
-#             self.docuGroup.replace(' ', '_'), '%s.rst' % self.applicationName)
-#         
-#         if not os.path.exists(os.path.dirname(docFileName)):
-#             os.mkdir(os.path.dirname(docFileName))
-#         
-#         if os.path.exists(docFileName):
-#             os.remove(docFileName)
-#         
-#         fo = open(docFileName, 'wt')
-#         fo.write('.. _%s: %s\n\n' % (self.applicationName, SPHINX_INDEX))
-#         fo.write('`%s`_ - %s\n\n' % (self.applicationName, self.docuDescription))
-#         fo.close()
-#         
-#         # update tool documentation
-#         updateScriptPath = os.path.join(self.DOCUMENTATON_PATH, 'buildHtmlDoc.py')
-#         utils.runSubprocess(updateScriptPath)
-        
+        utils.runSubprocess(updateScriptPath)    
     
     #---------------------------------------------------------------------------
                 
@@ -349,21 +322,23 @@ Revision history graph::
 class InstallTypeExecutable(BaseInstallType):
 
     NAME = BaseInstallType.TYPE_EXECUTABLE
-    PRODUCTIVE_VERSION_HOME = '/data/fem/+software/SKRIPTY/tools/%s'
-    REPOS_PATH = '/data/fem/+software/SKRIPTY/tools/repos'
-    PRODUCTIVE_VERSION_BIN = '/data/fem/+software/SKRIPTY/tools/bin'
+    INSTALL_PATHS = utils.getInstallTypePaths()['INSTALLATION_PATHS_TYPE_EXECUTABLE']
+    
+    PRODUCTIVE_VERSION_HOME = INSTALL_PATHS['PRODUCTIVE_VERSION_HOME']#'/data/fem/+software/SKRIPTY/tools/%s'
+    REPOS_PATH = INSTALL_PATHS['REPOS_PATH']#'/data/fem/+software/SKRIPTY/tools/repos'
+    PRODUCTIVE_VERSION_BIN = INSTALL_PATHS['PRODUCTIVE_VERSION_BIN']#'/data/fem/+software/SKRIPTY/tools/bin'
 
     def __init__(self, parentInstaller):
         super(InstallTypeExecutable, self).__init__(parentInstaller)
         
         self.executableName = ''
-        self.codeLanguage = ''
+        self.codeLanguage = 'python'
 
     #---------------------------------------------------------------------------
     
     def getTargetDir(self):
         
-        return self.PRODUCTIVE_VERSION_HOME % self.codeLanguage
+        return os.path.join(self.PRODUCTIVE_VERSION_HOME, self.codeLanguage)
         
     #---------------------------------------------------------------------------
     
@@ -380,9 +355,11 @@ class InstallTypeExecutable(BaseInstallType):
 class InstallTypeAnsaButton(BaseInstallType):
 
     NAME = BaseInstallType.TYPE_ANSA_BUTTON
-    PRODUCTIVE_VERSION_HOME = '/data/fem/+software/SKRIPTY/tools/python/ansaTools'
-    REPOS_PATH = '/data/fem/+software/SKRIPTY/tools/repos/ansaTools'
-    PRODUCTIVE_VERSION_BIN = '/data/fem/+software/SKRIPTY/tools/python/ansa_toolkit/default/ansa_toolkit/python_scripts'
+    INSTALL_PATHS = utils.getInstallTypePaths()['INSTALLATION_PATHS_TYPE_ANSA_BUTTON']
+    
+    PRODUCTIVE_VERSION_HOME = INSTALL_PATHS['PRODUCTIVE_VERSION_HOME']#'/data/fem/+software/SKRIPTY/tools/python/ansaTools'
+    REPOS_PATH = INSTALL_PATHS['REPOS_PATH']#'/data/fem/+software/SKRIPTY/tools/repos/ansaTools'
+    PRODUCTIVE_VERSION_BIN = INSTALL_PATHS['PRODUCTIVE_VERSION_BIN']#'/data/fem/+software/SKRIPTY/tools/python/ansa_toolkit/default/ansa_toolkit/python_scripts'
     
     def __init__(self, parentInstaller):
         super(InstallTypeAnsaButton, self).__init__(parentInstaller)
@@ -406,7 +383,7 @@ class InstallTypeAnsaButton(BaseInstallType):
     
     def _installAsDefault(self):
         
-        print 'Releasing to the productive version'
+        print('Releasing to the productive version')
         
         defaultDir = os.path.join(self.applicationPath, 'default')
         
@@ -420,7 +397,7 @@ class InstallTypeAnsaButton(BaseInstallType):
             os.unlink(symLink)
         os.symlink(executable, symLink)
         
-        os.chmod(symLink, 0775)
+        os.chmod(symLink, 0o775)
     
     #---------------------------------------------------------------------------
     
@@ -441,13 +418,15 @@ class InstallTypeAnsaButton(BaseInstallType):
 class InstallTypeAnsaCheck(BaseInstallType):
     
     NAME = BaseInstallType.TYPE_ANSA_CHECK
+    INSTALL_PATHS = utils.getInstallTypePaths()['INSTALLATION_PATHS_TYPE_ANSA_CHECK']
+    
     SOURCE_FILE_FILTER = 'ANSA check_*.py (check_*.py)'
 
 #TODO: installation is made from repository - change it to "update_ansa_checks" productive version
     
-    CHECK_INSTALLER_PATH = '/data/fem/+software/SKRIPTY/tools/repos/ansaChecksPlistUpdater/bin/main.py'
-    CHECK_INSTALLER_CHECK_PATH = '/data/fem/+software/SKRIPTY/tools/repos/ansaChecksPlistUpdater/res/checks'
-    PRODUCTIVE_VERSION_HOME = '/data/fem/+software/SKRIPTY/tools/python/ansaTools/checks/general_check/'
+    CHECK_INSTALLER_PATH = INSTALL_PATHS['CHECK_INSTALLER_PATH']#'/data/fem/+software/SKRIPTY/tools/repos/ansaChecksPlistUpdater/bin/main.py'
+    CHECK_INSTALLER_CHECK_PATH = INSTALL_PATHS['CHECK_INSTALLER_CHECK_PATH']#'/data/fem/+software/SKRIPTY/tools/repos/ansaChecksPlistUpdater/res/checks'
+    PRODUCTIVE_VERSION_HOME = INSTALL_PATHS['PRODUCTIVE_VERSION_HOME']#'/data/fem/+software/SKRIPTY/tools/python/ansaTools/checks/general_check/'
     
     #---------------------------------------------------------------------------
     
@@ -468,7 +447,7 @@ class InstallTypeAnsaCheck(BaseInstallType):
     
     def install(self, pyProjectPath, revision, applicationName, docuGroup, docuDescription, docString):
         
-        print 'Installing: %s' % self.NAME
+        print('Installing: %s' % self.NAME)
         
         self.targetDir = os.path.join(self.getTargetDir(), revision)
         self.revision = revision
@@ -503,17 +482,17 @@ class InstallTypeAnsaCheck(BaseInstallType):
     
     def _createRevisionContents(self):
 
-        print 'Creating a revision content in: "%s"' % self.targetDir
+        print('Creating a revision content in: "%s"' % self.targetDir)
         
         stdout, _ = utils.runSubprocess('%s -copy %s' % (self.CHECK_INSTALLER_PATH, self.targetDir))
         
-        print stdout
+        print(stdout)
 
     #---------------------------------------------------------------------------
     
     def _installAsDefault(self):
         
-        print 'Releasing to the productive version'
+        print('Releasing to the productive version')
         
         defaultDir = os.path.join(self.getTargetDir(), 'default')
         
@@ -543,9 +522,11 @@ class InstallTypeAnsaCheck(BaseInstallType):
 class InstallTypeMeta(BaseInstallType):
 
     NAME = BaseInstallType.TYPE_META
-    PRODUCTIVE_VERSION_HOME = '/data/fem/+software/SKRIPTY/tools/python/metaTools'
-    REPOS_PATH = '/data/fem/+software/SKRIPTY/tools/repos/metaTools'
-    PRODUCTIVE_VERSION_BIN = '/data/fem/+software/SKRIPTY/tools/python/meta_toolkit/default/meta_toolkit/python_scripts'
+    INSTALL_PATHS = utils.getInstallTypePaths()['INSTALLATION_PATHS_TYPE_META']
+    
+    PRODUCTIVE_VERSION_HOME = INSTALL_PATHS['PRODUCTIVE_VERSION_HOME']#'/data/fem/+software/SKRIPTY/tools/python/metaTools'
+    REPOS_PATH = INSTALL_PATHS['REPOS_PATH']#'/data/fem/+software/SKRIPTY/tools/repos/metaTools'
+    PRODUCTIVE_VERSION_BIN = INSTALL_PATHS['PRODUCTIVE_VERSION_BIN']#'/data/fem/+software/SKRIPTY/tools/python/meta_toolkit/default/meta_toolkit/python_scripts'
     
     def __init__(self, parentInstaller):
         super(InstallTypeMeta, self).__init__(parentInstaller)
@@ -564,7 +545,7 @@ class InstallTypeMeta(BaseInstallType):
     
     def _installAsDefault(self):
         
-        print 'Releasing to the productive version'
+        print('Releasing to the productive version')
         
         defaultDir = os.path.join(self.applicationPath, 'default')
         
@@ -578,7 +559,7 @@ class InstallTypeMeta(BaseInstallType):
             os.unlink(symLink)
         os.symlink(executable, symLink)
         
-        os.chmod(symLink, 0775)
+        os.chmod(symLink, 0o775)
         
         
 #==============================================================================
@@ -657,13 +638,13 @@ class DocumetationItem(BaseInstallerProcedureItem):
             self._changeExistingDocString(self.docString)
         # doc string unchanged
         else:
-            print 'Doc unchanged'
+            print('Doc unchanged')
     
     #---------------------------------------------------------------------------
     
     def _createNewDocString(self, text):
         
-        print 'Creating a new documentation string'
+        print('Creating a new documentation string')
         
         fi = open(self.parentInstaller.mainModulePath, 'rt')
         lines = fi.readlines()
@@ -686,7 +667,6 @@ class DocumetationItem(BaseInstallerProcedureItem):
         
         fo = open(self.parentInstaller.mainModulePath, 'wt')
         for line in newContent:
-#             print line[:-1]
             fo.write(line)
         fo.close()
         
@@ -694,7 +674,7 @@ class DocumetationItem(BaseInstallerProcedureItem):
     
     def _changeExistingDocString(self, text):
         
-        print 'Updating existing documentation string'
+        print('Updating existing documentation string')
         
         # original string
         docString = self.parentInstaller.mainModuleItem.docString
@@ -706,7 +686,6 @@ class DocumetationItem(BaseInstallerProcedureItem):
         newContent = content.replace(docString, text)
         
         fo = open(self.parentInstaller.mainModulePath, 'wt')
-#         print newContent
         fo.write(newContent)
         fo.close()
            
@@ -744,6 +723,8 @@ class VersionItem(BaseInstallerProcedureItem):
         
         self.tagList = list()
         for line in stdout.splitlines():
+            if not line.startswith('V'):
+                continue
             parts = line.strip().split()
             self.tagList.append(parts[0])
             self.tagInfo[parts[0]] = ' '.join(parts[1:])
@@ -932,7 +913,7 @@ class MainModuleItem(object):
     def _findDocString(self):
         
         for line in self.lines:
-            if line.startswith('import'):
+            if line.startswith('import') or (line.startswith('from ') and 'import' in line):
                 break
             else:
                 self.docHeaderLines.append(line)

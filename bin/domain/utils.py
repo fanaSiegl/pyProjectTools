@@ -5,7 +5,7 @@
 
 import os
 import sys
-import ConfigParser
+import configparser
 import numpy as np
 import subprocess
 
@@ -19,6 +19,7 @@ PATH_RES = os.path.normpath(os.path.join(PATH_BIN,'..', 'res'))
 PATH_ICONS = os.path.join(PATH_RES, 'icons')
 
 VERSION_FILE = 'version.ini'
+CONFIG_FILE = 'config.ini'
 USER_CONFIG_SETTINGS_FILE = 'user_settings.xml'
 
 #==============================================================================
@@ -49,7 +50,7 @@ def getVersionInfo():
 
     SECTION_VERSION = 'VERSION'
      
-    config = ConfigParser.ConfigParser()
+    config = configparser.ConfigParser()
      
     cfgFileName = os.path.join(PATH_INI, VERSION_FILE)
     config.read(cfgFileName)
@@ -73,8 +74,42 @@ def runSubprocess(command, cwd=None):
     process = subprocess.Popen(
         command, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
         cwd=cwd)
+    stdout, stderr = process.communicate()
     
-    return process.communicate()
+    if stdout is not None:
+        stdout = stdout.decode("ascii",errors="ignore")
+    if stderr is not None:
+        stderr = stderr.decode("ascii",errors="ignore")
+    
+    return stdout, stderr
 
 #==============================================================================
-   
+
+def getInstallTypePaths():
+         
+    config = configparser.ConfigParser()
+     
+    cfgFileName = os.path.join(PATH_INI, CONFIG_FILE)
+    config.read(cfgFileName)
+    
+    sections = dict()
+    for sectionName in config.sections():
+        sections[sectionName] = config[sectionName]
+    
+    return sections
+
+#==============================================================================
+
+def getEnvironmentExecutable(configFilePath):
+         
+    config = configparser.ConfigParser()
+    
+    try:
+        cfgFileName = os.path.join(configFilePath, CONFIG_FILE)
+        config.read(cfgFileName)
+    
+        return config['GENERAL']['EXECUTABLE']
+    except Exception as e:
+        return None
+    
+#==============================================================================

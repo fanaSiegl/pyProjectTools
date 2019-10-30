@@ -3,6 +3,6 @@
 
 import os
 
-os.system('sphinx-build -b html -d build/doctrees source build/html')
+os.system('/data/fem/envs/python35_pyqt4/bin/sphinx-build -b html -d build/doctrees source build/html')
 
 print("Build finished.")

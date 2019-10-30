@@ -254,9 +254,22 @@ Revision history graph::
             fo.write('   %s\n' % line)
         fo.close()
         
-        # create local documentation
-        utils.runSubprocess('sphinx-build -b html -d %s %s %s' % (
-            SPHINX_DOCTREES, SPHINX_SOURCE, SPHINX_HTML))
+        # create local documentation respecting target environment 
+        envExecutable = utils.getEnvironmentExecutable(
+            os.path.join(self.targetDir, 'ini'))
+        if envExecutable is not None:
+            utils.runSubprocess('%s -b html -d %s %s %s' % (
+                os.path.join(os.path.dirname(envExecutable), 'sphinx-build'), 
+                SPHINX_DOCTREES, SPHINX_SOURCE, SPHINX_HTML))
+        else:
+            utils.runSubprocess('sphinx-build -b html -d %s %s %s' % (
+                SPHINX_DOCTREES, SPHINX_SOURCE, SPHINX_HTML))
+        
+        # create a link
+        linkPath = os.path.join(self.targetDir, 'doc', 'documentation.html') 
+        if not os.path.islink(linkPath):
+            os.symlink('.' + os.sep + os.path.join('sphinx', 'build', 'html', 'index.html'),
+                linkPath)
     
     #---------------------------------------------------------------------------
     
@@ -264,15 +277,18 @@ Revision history graph::
         
         print('Updating tool documentation')
         
+        localLocation = utils.getInstallTypePaths()['GENERAL']['LOCAL_DOCUMENTATION']
+        
         SPHINX_LOCAL_DOC_SOURCE = os.path.join(self.targetDir, 'doc', 'sphinx', 'source')
     
-        SPHINX_INDEX = os.path.join(
+        SPHINX_INDEX = os.path.join(localLocation,
             self.docuGroup.replace(' ', '_'), self.applicationName,
             '%s.html' % self.applicationName)
         
         # copy to tool documentation
         # create main link file
-        SPHINX_GLOBAL_DOC_SOURCE = os.path.join(self.DOCUMENTATON_PATH, 'source',
+        SPHINX_GLOBAL_DOC_SOURCE = os.path.join(self.DOCUMENTATON_PATH,
+            'res', 'source', localLocation,       
             self.docuGroup.replace(' ', '_'), self.applicationName)
         docFileName = os.path.join(SPHINX_GLOBAL_DOC_SOURCE,
             '%s.txt' % self.applicationName)
@@ -311,8 +327,8 @@ Revision history graph::
             os.remove(os.path.join(SPHINX_GLOBAL_DOC_SOURCE, 'index.rst'))
         
         # update tool documentation
-        updateScriptPath = os.path.join(self.DOCUMENTATON_PATH, 'buildHtmlDoc.py')
-        utils.runSubprocess(updateScriptPath)    
+#         updateScriptPath = os.path.join(self.DOCUMENTATON_PATH, 'buildHtmlDoc.py')
+        utils.runSubprocess(os.path.join(self.PRODUCTIVE_VERSION_BIN, 'doc-update'))
     
     #---------------------------------------------------------------------------
                 
@@ -639,7 +655,41 @@ class DocumetationItem(BaseInstallerProcedureItem):
         # doc string unchanged
         else:
             print('Doc unchanged')
-    
+        
+        # check corresponding executable for sphinx-build 
+        # (to ensure that all modules are present in the interpreter for automodule::)
+        projectPath = os.path.dirname(os.path.dirname(
+            self.parentInstaller.mainModuleItem.sourceMainPath))
+        configFilePath = os.path.join(projectPath, 'ini')
+        envExecutable = utils.getEnvironmentExecutable(configFilePath)
+        if envExecutable is not None:
+            print('Updating external executable for sphinx documentation generation.')
+            try:
+                buildHtmlFileName = os.path.join(projectPath,
+                    'doc', 'sphinx', 'buildHtmlDoc.py')
+                
+                fi = open(buildHtmlFileName, 'rt')
+                lines = fi.readlines()
+                fi.close()
+                
+                for lineNo, line in enumerate(lines):
+                    if line.startswith("os.system('sphinx-build "):
+                        newLine = line.replace('sphinx-build', 
+                            os.path.join(os.path.dirname(envExecutable), 'sphinx-build'))
+                        lines[lineNo] = newLine
+                    elif line.startswith("os.system('"):
+                        index =  line.find('sphinx-build')
+                        newLine = "os.system('%s/" % os.path.dirname(envExecutable) + line[index:]                        
+                        lines[lineNo] = newLine
+                    
+                fo = open(buildHtmlFileName, 'wt')
+                for line in lines:
+                    fo.write(line)
+                fo.close()
+            except Exception as e:
+                print('Failed to update external executable for documentation \
+                generation! (%s)' % str(e))
+            
     #---------------------------------------------------------------------------
     
     def _createNewDocString(self, text):

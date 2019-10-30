@@ -124,7 +124,8 @@ class BaseExtendableComboBox(QtGui.QComboBox):
 
 class DocumentationGroupComboBox(BaseExtendableComboBox):
     
-    DOCU_GROUPS_PATH = '/data/fem/+software/SKRIPTY/tools/python/tool_documentation/default/source'
+    DOCU_GROUPS_PATH = utils.getInstallTypePaths()[
+        'INSTALLATION_PATHS_BASE']['DOCUMENTATON_PATH']
     NEW_ITEM_TEXT = '+ add a new group'
     NEW_ITEM_WINDOW_LABEL = 'New tool group'
     NEW_ITEM_DESCRIPTION = 'Select new tool documentation group name'
@@ -134,9 +135,19 @@ class DocumentationGroupComboBox(BaseExtendableComboBox):
     
     def _setupItems(self):
         
-        for item in os.listdir(self.DOCU_GROUPS_PATH):
-            if os.path.isdir(os.path.join(self.DOCU_GROUPS_PATH, item)):
-                self.addItem(item)
+        toolGroups = set()
+        
+        sourcePath = os.path.join(self.DOCU_GROUPS_PATH, 'res', 'source')
+        if os.path.exists(sourcePath):
+            for location in os.listdir(sourcePath):
+                if os.path.isdir(os.path.join(sourcePath, location)):
+                
+                    for item in os.listdir(os.path.join(sourcePath, location)):
+                        if os.path.isdir(os.path.join(sourcePath, location, item)):
+                            toolGroups.add(item)
+            
+            for toolGroup in toolGroups:
+                self.addItem(toolGroup)
         
         self.addItem(self.NEW_ITEM_TEXT)
         
@@ -219,7 +230,7 @@ class CodeTypeComboBox(BaseExtendableComboBox):
     NEW_ITEM_DESCRIPTION = 'Select new programming language group.'
     
     DFT_LANGUAGE = 'python'    
-    TOOL_ROOT = utils.getInstallTypePaths()['INSTALLATION_PATHS_TYPE_EXECUTABLE']['PRODUCTIVE_VERSION_HOME']#'/data/fem/+software/SKRIPTY/tools'
+    TOOL_ROOT = utils.getInstallTypePaths()['INSTALLATION_PATHS_TYPE_EXECUTABLE']['PRODUCTIVE_VERSION_HOME']
     IGNORE_ROOT_DIRS = ['bin', 'repos']
 
     #---------------------------------------------------------------------------

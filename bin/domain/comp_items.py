@@ -61,8 +61,10 @@ class Installer(object):
             self.procedureItems[bi.DocumetationItem.NAME].docuGroup,
             self.procedureItems[bi.DocumetationItem.NAME].docuDescription,
             self.procedureItems[bi.DocumetationItem.NAME].docString)
-         
-        self._createMasterRepository()
+        
+        # create master repository if not installing ANSA check
+        if self.getCurrentInstallType() != bi.BaseInstallType.TYPE_ANSA_CHECK:
+            self._createMasterRepository()
     
     #---------------------------------------------------------------------------
     
@@ -70,7 +72,7 @@ class Installer(object):
         
         self.mainModuleItem.load(mainModulePath)
         
-        # handle ANSA check type special behavior
+        # ANSA check type special behavior
         if self.getCurrentInstallType() == bi.BaseInstallType.TYPE_ANSA_CHECK:
         
             self.mainModulePath = bi.InstallTypeAnsaCheck.CHECK_INSTALLER_PATH

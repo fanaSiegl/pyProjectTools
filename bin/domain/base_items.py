@@ -3,6 +3,7 @@
 
 import os
 import sys
+import glob
 import string
 import tempfile
 import shutil
@@ -67,11 +68,12 @@ class BaseInstallType(BaseParamItem):
     INSTALL_PATHS = utils.getInstallTypePaths()['INSTALLATION_PATHS_BASE']
     
     EXECUTABLE = 'bin/main.py'
-    PRODUCTIVE_VERSION_BIN = INSTALL_PATHS['PRODUCTIVE_VERSION_BIN']#'/data/fem/+software/SKRIPTY/tools/bin'
-    PRODUCTIVE_VERSION_HOME = INSTALL_PATHS['PRODUCTIVE_VERSION_HOME']#'/data/fem/+software/SKRIPTY/tools/python'
-    REPOS_PATH = INSTALL_PATHS['REPOS_PATH']#'/data/fem/+software/SKRIPTY/tools/repos'
+    GENERAL_PRODUCTIVE_VERSION_BIN = INSTALL_PATHS['GENERAL_PRODUCTIVE_VERSION_BIN']
+    PRODUCTIVE_VERSION_BIN = INSTALL_PATHS['PRODUCTIVE_VERSION_BIN']
+    PRODUCTIVE_VERSION_HOME = INSTALL_PATHS['PRODUCTIVE_VERSION_HOME']
+    REPOS_PATH = INSTALL_PATHS['REPOS_PATH']
     VERSION_FILE = 'ini/version.ini'
-    DOCUMENTATON_PATH = INSTALL_PATHS['DOCUMENTATON_PATH']#'/data/fem/+software/SKRIPTY/tools/python/tool_documentation/default'
+    DOCUMENTATON_PATH = INSTALL_PATHS['DOCUMENTATON_PATH']
     
     SOURCE_FILE_FILTER = 'pyProject main.py (main.py)'
     
@@ -254,6 +256,21 @@ Revision history graph::
             fo.write('   %s\n' % line)
         fo.close()
         
+        # update index file
+        newIndexLines = list()
+        fi = open(os.path.join(SPHINX_SOURCE, 'index.rst'), 'rt')
+        for line in fi.readlines():
+            if line.startswith('.. automodule:: main'):
+                newIndexLines.append('\n%s\n' % self.docString)
+            else:
+                newIndexLines.append(line)
+        fi.close()
+        
+        fo = open(os.path.join(SPHINX_SOURCE, 'index.rst'), 'wt')
+        for line in newIndexLines:
+            fo.write(line)
+        fo.close()
+        
         # create local documentation respecting target environment 
         envExecutable = utils.getEnvironmentExecutable(
             os.path.join(self.targetDir, 'ini'))
@@ -327,8 +344,7 @@ Revision history graph::
             os.remove(os.path.join(SPHINX_GLOBAL_DOC_SOURCE, 'index.rst'))
         
         # update tool documentation
-#         updateScriptPath = os.path.join(self.DOCUMENTATON_PATH, 'buildHtmlDoc.py')
-        utils.runSubprocess(os.path.join(self.PRODUCTIVE_VERSION_BIN, 'doc-update'))
+        utils.runSubprocess(os.path.join(self.GENERAL_PRODUCTIVE_VERSION_BIN, 'doc-update'))
     
     #---------------------------------------------------------------------------
                 
@@ -340,9 +356,9 @@ class InstallTypeExecutable(BaseInstallType):
     NAME = BaseInstallType.TYPE_EXECUTABLE
     INSTALL_PATHS = utils.getInstallTypePaths()['INSTALLATION_PATHS_TYPE_EXECUTABLE']
     
-    PRODUCTIVE_VERSION_HOME = INSTALL_PATHS['PRODUCTIVE_VERSION_HOME']#'/data/fem/+software/SKRIPTY/tools/%s'
-    REPOS_PATH = INSTALL_PATHS['REPOS_PATH']#'/data/fem/+software/SKRIPTY/tools/repos'
-    PRODUCTIVE_VERSION_BIN = INSTALL_PATHS['PRODUCTIVE_VERSION_BIN']#'/data/fem/+software/SKRIPTY/tools/bin'
+    PRODUCTIVE_VERSION_HOME = INSTALL_PATHS['PRODUCTIVE_VERSION_HOME']
+    REPOS_PATH = INSTALL_PATHS['REPOS_PATH']
+    PRODUCTIVE_VERSION_BIN = INSTALL_PATHS['PRODUCTIVE_VERSION_BIN']
 
     def __init__(self, parentInstaller):
         super(InstallTypeExecutable, self).__init__(parentInstaller)
@@ -540,22 +556,23 @@ class InstallTypeMeta(BaseInstallType):
     NAME = BaseInstallType.TYPE_META
     INSTALL_PATHS = utils.getInstallTypePaths()['INSTALLATION_PATHS_TYPE_META']
     
-    PRODUCTIVE_VERSION_HOME = INSTALL_PATHS['PRODUCTIVE_VERSION_HOME']#'/data/fem/+software/SKRIPTY/tools/python/metaTools'
-    REPOS_PATH = INSTALL_PATHS['REPOS_PATH']#'/data/fem/+software/SKRIPTY/tools/repos/metaTools'
-    PRODUCTIVE_VERSION_BIN = INSTALL_PATHS['PRODUCTIVE_VERSION_BIN']#'/data/fem/+software/SKRIPTY/tools/python/meta_toolkit/default/meta_toolkit/python_scripts'
+    PRODUCTIVE_VERSION_HOME = INSTALL_PATHS['PRODUCTIVE_VERSION_HOME']
+    REPOS_PATH = INSTALL_PATHS['REPOS_PATH']
+    PRODUCTIVE_VERSION_BIN = INSTALL_PATHS['PRODUCTIVE_VERSION_BIN']
     
     def __init__(self, parentInstaller):
         super(InstallTypeMeta, self).__init__(parentInstaller)
         
         self.toolbarName = ''
-        self.buttonName = ''
+#        self.buttonName = ''
 
     #---------------------------------------------------------------------------
     
     def addChecks(self):
         
         self.checker._checkEmptyParam('toolbarName', 'META Toolbar name')
-        self.checker._checkEmptyParam('buttonName', 'Tool button name')
+#         self.checker._checkEmptyParam('buttonName', 'Tool button name')
+        self.checker._checkMetaToolbarName()
 
     #---------------------------------------------------------------------------
     
@@ -563,20 +580,20 @@ class InstallTypeMeta(BaseInstallType):
         
         print('Releasing to the productive version')
         
-        defaultDir = os.path.join(self.applicationPath, 'default')
+        defaultDir = os.path.join(self.getTargetDir(), self.applicationName, 'default')
         
         if os.path.islink(defaultDir):
             os.unlink(defaultDir)
         os.symlink(self.revision, defaultDir)
         
-        symLink = os.path.join(self.PRODUCTIVE_VERSION_BIN, 'tool_%s.py' % self.buttonName)
-        executable = os.path.join(defaultDir, self.EXECUTABLE)
-        if os.path.islink(symLink):
-            os.unlink(symLink)
-        os.symlink(executable, symLink)
-        
-        os.chmod(symLink, 0o775)
-        
+        defaultFileName = os.path.join(
+            self.PRODUCTIVE_VERSION_BIN, 'toolbar_%s.path' % self.applicationName)
+                
+        fo = open(defaultFileName, 'wt')
+        fo.write('${toolbar_folder}%s/default/bin/toolbar.defaults' % self.applicationName)
+        fo.close()
+    
+                
         
 #==============================================================================
 
@@ -901,8 +918,51 @@ class BaseInstallItemChecker(object):
                 self.status += self.CHECK_TYPE_CRITICAL
             else:
                 message = 'New version check ok.'
-                self.report.append([self.CHECK_TYPE_OK, message])  
-            
+                self.report.append([self.CHECK_TYPE_OK, message])
+    
+    
+    #---------------------------------------------------------------------------
+
+    def _checkMetaToolbarName(self):
+        
+        toolbarDefaultsFileName = os.path.join(
+            os.path.dirname(self.installItem.parentInstaller.mainModuleItem.sourceMainPath),
+            'toolbar.defaults')
+        
+        if not os.path.exists(toolbarDefaultsFileName):
+            message = 'toolbar.defaults "%s" file does not exist!' % toolbarDefaultsFileName
+            self.report.append([self.CHECK_TYPE_CRITICAL, message])
+            self.status += self.CHECK_TYPE_CRITICAL
+        else:
+            message = 'toolbar.defaults name ok.'
+            self.report.append([self.CHECK_TYPE_OK, message])
+        
+            fi = open(toolbarDefaultsFileName, 'rt')
+            for line in fi.readlines():
+                if line.startswith('toolbar start ') and self.installItem.toolbarName not in line:
+                    message = 'Non-consistent toolbar name found in "toolbar.defaults"! Given: "%s", found: "%s"' % (
+                        self.installItem.toolbarName, line.strip().replace('toolbar start ', ''))
+                    self.report.append([self.CHECK_TYPE_CRITICAL, message])
+                    self.status += self.CHECK_TYPE_CRITICAL
+                    break
+            fi.close()
+
+#         return
+#     
+#         existingToolbarNames = list()
+#         for toolbarName in os.listdir(self.installItem.PRODUCTIVE_VERSION_HOME):
+#             path = os.path.join(self.installItem.PRODUCTIVE_VERSION_HOME, toolbarName)
+#             if os.path.isdir(path):
+#                 existingToolbarNames.append(toolbarName)
+#             
+#         if self.installItem.toolbarName in existingToolbarNames:
+#             message = 'Given toolbar name: "%s" already exists!' % self.installItem.toolbarName
+#             self.report.append([self.CHECK_TYPE_CRITICAL, message])
+#             self.status += self.CHECK_TYPE_CRITICAL
+#         else:
+#             message = 'Toolbar name ok.'
+#             self.report.append([self.CHECK_TYPE_OK, message])
+        
     #---------------------------------------------------------------------------
     
     def initiateReport(self):
@@ -936,6 +996,11 @@ class MainModuleItem(object):
         self.applicationName = ''
         self.documentationGroup = ''
         self.documentationDescription = ''
+        
+        self.ansaButtonName = ''
+        self.ansaButtonGroupName = ''
+        
+        self.metaToolbarName = ''
     
     #---------------------------------------------------------------------------
     
@@ -987,21 +1052,21 @@ class MainModuleItem(object):
     
     def _findProjectParams(self, mainModule):
         
-        try:
-            self.applicationName = mainModule.APPLICATION_NAME
-        except AttributeError:
-            pass
-        try:
-            self.documentationGroup = mainModule.DOCUMENTATON_GROUP
-        except AttributeError:
-            pass
-        try:
-            self.documentationDescription = mainModule.DOCUMENTATON_DESCRIPTION
-        except AttributeError:
-            pass
+        attributeMap = {
+            'applicationName'       : 'APPLICATION_NAME',
+            'documentationGroup'    : 'DOCUMENTATON_GROUP',
+            'documentationDescription': 'DOCUMENTATON_DESCRIPTION',
+            'ansaButtonName'        : 'BUTTON_NAME',
+            'ansaButtonGroupName'   : 'BUTTON_GROUP_NAME',
+            'metaToolbarName'       : 'TOOLBAR_NAME'
+            }
         
-        if self.applicationName != '' and self.documentationGroup != '' and  self.documentationDescription != '':
-            return
+        # try native import
+        for attrName, mainAttrName in attributeMap.items():
+            try:
+                setattr(self, attrName, getattr(mainModule, mainAttrName))
+            except Exception:
+                pass
         
         # alternative search
         def getLineParamValue(line):
@@ -1009,12 +1074,10 @@ class MainModuleItem(object):
             return parts[-1].strip()
         
         for line in self.lines:
-            if line.startswith('APPLICATION_NAME') and self.applicationName == '':
-                self.applicationName = getLineParamValue(line)
-            elif line.startswith('DOCUMENTATON_GROUP') and self.documentationGroup == '':
-                self.documentationGroup = getLineParamValue(line)
-            elif line.startswith('DOCUMENTATON_DESCRIPTION') and self.documentationDescription == '':
-                self.documentationDescription = getLineParamValue(line)
+            for attrName, mainAttrName in attributeMap.items():
+                if line.startswith(mainAttrName) and getattr(self, attrName) == '':
+                    setattr(self, attrName,
+                        self._stripFunctionParamString(getLineParamValue(line)))   
     
     #---------------------------------------------------------------------------
     

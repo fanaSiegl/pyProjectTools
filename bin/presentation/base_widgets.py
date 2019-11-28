@@ -510,23 +510,24 @@ class ExecConfigMetaWidget(BaseConfigExecutableWidget):
         self.layout().addWidget(QtGui.QLabel('Toolbar name'), 0, 0)
         self.layout().addWidget(self.toolbarNameLineEdit, 0, 1)
 
-        self.buttonNameLineEdit = QtGui.QLineEdit()
-        
-        self.layout().addWidget(QtGui.QLabel('Button name'), 1, 0)
-        self.layout().addWidget(self.buttonNameLineEdit, 1, 1)
+#         self.buttonNameLineEdit = QtGui.QLineEdit()
+#         
+#         self.layout().addWidget(QtGui.QLabel('Button name'), 1, 0)
+#         self.layout().addWidget(self.buttonNameLineEdit, 1, 1)
 
     #---------------------------------------------------------------------------
     
     def _setupConnections(self):
         
         self._connectLineEditWidget(self.toolbarNameLineEdit, 'toolbarName')
-        self._connectLineEditWidget(self.buttonNameLineEdit, 'buttonName')
+#         self._connectLineEditWidget(self.buttonNameLineEdit, 'buttonName')
         
     #---------------------------------------------------------------------------
     
     def setProjectName(self, projectName):
-                    
-        self.buttonNameLineEdit.clear()
-        self.buttonNameLineEdit.setText(projectName)
+        
+        self.toolbarNameLineEdit.clear()        
+        self.toolbarNameLineEdit.setText(
+            self.installer.mainModuleItem.metaToolbarName)
         
 #==============================================================================

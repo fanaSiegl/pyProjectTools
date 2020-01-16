@@ -16,7 +16,9 @@ all corresponding procedures:
 Usage
 -----
 
-pyProjectInstaller 
+usage::
+
+    pyProjectInstaller 
 
   
 '''

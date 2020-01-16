@@ -423,14 +423,58 @@ class InstallTypeAnsaButton(BaseInstallType):
             os.unlink(defaultDir)
         os.symlink(self.revision, defaultDir)
         
-        symLink = os.path.join(self.PRODUCTIVE_VERSION_BIN, 'tool_%s.py' % self.buttonName)
-        executable = os.path.join(defaultDir, self.EXECUTABLE)
-        if os.path.islink(symLink):
-            os.unlink(symLink)
-        os.symlink(executable, symLink)
+        # create link file which will be loaded by ansaTookit
+        docString = self.parentInstaller.procedureItems[DocumetationItem.NAME].docString
         
-        os.chmod(symLink, 0o775)
+        BUTTON_LINK_TEMPLATE = '''# PYTHON script
+# -*- coding: utf-8 -*-
+
+${docString}
+
+import os
+import sys
+
+import ansa
+
+# ==============================================================================
+
+BUTTON_NAME = '${buttonName}'
+BUTTON_GROUP_NAME = '${buttonGroupName}'
+APPLICATION_NAME = '${applicationName}'
+PATH_TOOLS = os.environ['ANSA_TOOLS']
+PATH_TOOL = os.path.join(PATH_TOOLS, APPLICATION_NAME, 'default', 'bin')
+
+# ==============================================================================
+@ansa.session.defbutton(BUTTON_GROUP_NAME, BUTTON_NAME, __doc__)
+def ${applicationName}RunFcn():
     
+    sys.path.append(PATH_TOOL)
+    ansa.ImportCode(os.path.join(PATH_TOOL, 'main.py'))
+    mainModule = main
+
+    mainModule.${execFunction}()
+
+    sys.path.remove(PATH_TOOL)
+
+# ==============================================================================
+
+'''
+                
+        template = string.Template(BUTTON_LINK_TEMPLATE)
+        
+        outputString = template.safe_substitute(
+            {'docString' : "'''\n%s\n'''" % docString,
+             'buttonName' : self.buttonName,
+             'buttonGroupName' : self.buttonGroupName,
+             'applicationName' : self.applicationName,
+             'execFunction' : self.execFunction})
+        
+        symLink = os.path.join(self.PRODUCTIVE_VERSION_BIN, 'tool_%s.py' % self.applicationName)
+        
+        fo = open(symLink, 'wt')
+        fo.write(outputString)
+        fo.close()
+
     #---------------------------------------------------------------------------
     
     def _insertAnsaButtonDecorator(self):
@@ -1115,6 +1159,12 @@ class MainModuleItem(object):
                     paramParts = params.split(',')
                     group = self._stripFunctionParamString(paramParts[0])
                     buttonName = self._stripFunctionParamString(paramParts[1])
+                    
+                    # check if kept default
+                    if group == 'BUTTON_GROUP_NAME':
+                        group = self.ansaButtonGroupName
+                    if buttonName == 'BUTTON_NAME':
+                        buttonName = self.ansaButtonName
                     
                     # decorated function
                     parts = line.split('(')

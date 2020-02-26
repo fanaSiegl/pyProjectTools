@@ -348,6 +348,7 @@ class ExecConfigPageWidget(BaseInstallerPageWidget):
     DFT_INSTALLATION_TYPE = bi.BaseInstallType.TYPE_EXECUTABLE
     
     mainModuleSet = QtCore.pyqtSignal(str)
+    sourceTypeChanged = QtCore.pyqtSignal()
     
     #--------------------------------------------------------------------------
 
@@ -405,6 +406,17 @@ class ExecConfigPageWidget(BaseInstallerPageWidget):
             # register added widget for easier switching
             self.execConfigWidgets[
                 currentWidget.NAME] = self.executableStackedWidget.indexOf(currentWidget)
+        
+        # installation source        
+        sourceTypeLayout = QtGui.QHBoxLayout()
+        groupSource.layout().addLayout(sourceTypeLayout)
+        
+        self.localReposRadioButton = QtGui.QRadioButton('Local repository')
+        self.remoteInstallationRadioButton = QtGui.QRadioButton('Remote installation')
+        
+        sourceTypeLayout.addWidget(QtGui.QLabel('Source type'))
+        sourceTypeLayout.addWidget(self.localReposRadioButton)
+        sourceTypeLayout.addWidget(self.remoteInstallationRadioButton)
 
     #--------------------------------------------------------------------------
     
@@ -422,6 +434,8 @@ class ExecConfigPageWidget(BaseInstallerPageWidget):
         # initiate install type
         execConfigType = self.executableStackedWidget.currentWidget()
         self._setInstallationType(execConfigType.installationItem)
+        
+        self.localReposRadioButton.setChecked(True)
 
     #--------------------------------------------------------------------------
 
@@ -433,7 +447,18 @@ class ExecConfigPageWidget(BaseInstallerPageWidget):
         self.browseButton.clicked.connect(self._selectSourcePyProject)
         
         self._connectLineEditWidget(self.sourcePyProjectNameLineEdit, 'projectName')
-                
+        
+        self.remoteInstallationRadioButton.toggled.connect(self._sourceTypeChanged)
+    
+    #--------------------------------------------------------------------------
+    
+    def _sourceTypeChanged(self):
+        
+        self.installer.fromRemoteInstallation = self.remoteInstallationRadioButton.isChecked()
+        
+        self.sourceTypeChanged.emit()
+        self._setupPyProjectName(self.installer.mainModulePath)
+                        
     #--------------------------------------------------------------------------
     
     def _installTypeChanged(self):
@@ -507,14 +532,7 @@ class ExecConfigPageWidget(BaseInstallerPageWidget):
         
         ''' Name for the new loaded module must always be unique. Otherwise
         there are issues obtaining the doc string properly.'''
-        
-#         
-#         tmpFile = tempfile.NamedTemporaryFile()
-#         
-#         mainModule = imp.load_source(tmpFile.name, str(sourceMainPath))
-#         
-#         self.mainModuleSet.emit(mainModule)
-        
+                
         self.mainModuleSet.emit(sourceMainPath)
                 
     #--------------------------------------------------------------------------
@@ -626,6 +644,16 @@ class DocumentationPageWidget(BaseInstallerPageWidget):
             self.docuGroupCombobox.setEnabled(True)
             self.docuDescription.setEnabled(True)
         
+        # deactivate all in case of remote installation source 
+        if self.installer.fromRemoteInstallation:
+            self.docuGroupCombobox.setEnabled(False)
+            self.docuDescription.setEnabled(False)
+            self.editDocStringButton.setEnabled(False)
+        else:
+            self.docuGroupCombobox.setEnabled(True)
+            self.docuDescription.setEnabled(True)
+            self.editDocStringButton.setEnabled(True)
+        
         self.hasFinished.emit()
 
     #--------------------------------------------------------------------------
@@ -724,15 +752,7 @@ class VersionPageWidget(BaseInstallerPageWidget):
     #--------------------------------------------------------------------------
     
     def _setupTagList(self):
-                
-#         stdout, stderr = utils.runSubprocess('git tag -n9',
-#             cwd=os.path.dirname(self.parentApplication.sourceMainPath))
-#         
-#         tagList = list()
-#         for line in stdout.splitlines():
-#             parts = line.strip().split()
-#             tagList.append(parts[0])
-        
+                        
         self.installationItem.setCurrentTagList(
             os.path.dirname(self.parentApplication.installer.mainModulePath))
         
@@ -797,38 +817,18 @@ class VersionPageWidget(BaseInstallerPageWidget):
         self.commitMessageTextEdit.clear()
         
         self._setupTagList()
-        self._setupProjectStatus()
+        
+        # deactivate all in case of remote installation source 
+        if self.installer.fromRemoteInstallation:
+            self.tagCombobox.setEnabled(False)
+        else:
+            self.tagCombobox.setEnabled(True)    
+            self._setupProjectStatus()
         
         self.hasFinished.emit()
         
     #---------------------------------------------------------------------------
-    
-#     def getCommitMessage(self):
-#         
-#         message = str(self.commitMessageTextEdit.toPlainText())
-#         
-#         if len(message) == 0:
-#             raise RevisionException('Please add commit description.')
-#         
-#         return message
-    
-#     #---------------------------------------------------------------------------
-#     
-#     def getNewFilesToAdd(self):
-#     
-#         newFileList = list()
-#         for i in range(self.utrackedFilesListWidget.count()):
-#             item = self.utrackedFilesListWidget.item(i)
-#             if item.checkState() == QtCore.Qt.Checked:
-#                 newFileList.append(str(item.text()))
-#         
-#         return newFileList
-    
-    #---------------------------------------------------------------------------
-    
-#     def getTagName(self):
-#         return str(self.tagCombobox.currentText())
-            
+                
 #==============================================================================
 
 

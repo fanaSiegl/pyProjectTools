@@ -61,6 +61,25 @@ def getVersionInfo():
  
     return revision, modifiedBy, lastModified
 
+#==============================================================================
+
+def getRemoteVersionInfo(pyProjectPath):
+
+    SECTION_VERSION = 'VERSION'
+    pathIni = os.path.normpath(os.path.join(
+        pyProjectPath, '..', 'ini'))
+    
+    config = configparser.ConfigParser()
+     
+    cfgFileName = os.path.join(pathIni, VERSION_FILE)
+    config.read(cfgFileName)
+         
+    revision = config.get(SECTION_VERSION, 'REVISION')
+    modifiedBy = config.get(SECTION_VERSION, 'AUTHOR')
+    lastModified = config.get(SECTION_VERSION, 'MODIFIED')
+ 
+    return revision, modifiedBy, lastModified
+
 #===============================================================================
 
 def registerClass(cls):

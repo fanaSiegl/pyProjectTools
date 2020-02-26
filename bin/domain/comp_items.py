@@ -23,6 +23,7 @@ class Installer(object):
                 
         self.mainModulePath = ''
         self.pyProjectPath = ''
+        self.fromRemoteInstallation = False
         
         self._initialiseInstallationItems()
     
@@ -46,13 +47,15 @@ class Installer(object):
         for procedureItem in self.procedureItems.values():
             procedureItem.updateForInstallation()   
         
-        tagName = self.procedureItems[bi.VersionItem.NAME].tagName
-        tagList = self.procedureItems[bi.VersionItem.NAME].tagList
-        if tagName not in tagList:              
-            self._createNewRevision(
-                self.procedureItems[bi.VersionItem.NAME].tagName,
-                self.procedureItems[bi.VersionItem.NAME].commitMessage,
-                self.procedureItems[bi.VersionItem.NAME].filesToAdd)
+        # create revision only if source project type is local revision
+        if not self.fromRemoteInstallation:
+            tagName = self.procedureItems[bi.VersionItem.NAME].tagName
+            tagList = self.procedureItems[bi.VersionItem.NAME].tagList
+            if tagName not in tagList:              
+                self._createNewRevision(
+                    self.procedureItems[bi.VersionItem.NAME].tagName,
+                    self.procedureItems[bi.VersionItem.NAME].commitMessage,
+                    self.procedureItems[bi.VersionItem.NAME].filesToAdd)
            
         self.procedureItems[bi.InstallationSetupItem.NAME].installTypeItem.install(
             self.pyProjectPath,
@@ -63,7 +66,9 @@ class Installer(object):
             self.procedureItems[bi.DocumetationItem.NAME].docString)
         
         # create master repository if not installing ANSA check
-        if self.getCurrentInstallType() != bi.BaseInstallType.TYPE_ANSA_CHECK:
+        if self.getCurrentInstallType() != bi.BaseInstallType.TYPE_ANSA_CHECK \
+            and not self.fromRemoteInstallation:
+            
             self._createMasterRepository()
     
     #---------------------------------------------------------------------------

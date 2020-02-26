@@ -6,7 +6,7 @@ pyProjectInstaller
 ==================
 
 Python script for pyProject installation. According to the given 
-installation type (execulable script, ANSA button, META button) handles
+installation type (execulable script, ANSA button, ANSA check, META button) handles
 all corresponding procedures:
 
 * installs pyProject to the default project structure
@@ -20,7 +20,13 @@ usage::
 
     pyProjectInstaller 
 
-  
+    
+It is possible to use either "Local repository" or "Remote installation" 
+as a source for installation.
+    
+    * Local repository type - pyProject to be installed has its repository (by script development)
+    * Remote installation type - pyProject to be installed has been received from other business unit (by installation of an existing tool)
+
 '''
 
 #===============================================================================
@@ -95,7 +101,7 @@ class InstallerApplication(QtGui.QApplication):
         self._setupConnections()
         
         self.mainWindow.show()
-        
+            
         self._checkGitConfig()
             
     #---------------------------------------------------------------------------
@@ -108,7 +114,18 @@ class InstallerApplication(QtGui.QApplication):
         self.installerPages[cw.ExecConfigPageWidget.NAME].setupContent()
         self.installerPages[cw.DocumentationPageWidget.NAME].setupContent()
         self.installerPages[cw.VersionPageWidget.NAME].setupContent()
-                                
+    
+    #---------------------------------------------------------------------------
+    @saveExecute
+    def updateContent(self):
+        
+        if len(self.installer.mainModulePath) == 0:
+            return
+                
+        self.installerPages[cw.ExecConfigPageWidget.NAME].setupContent()
+        self.installerPages[cw.DocumentationPageWidget.NAME].setupContent()
+        self.installerPages[cw.VersionPageWidget.NAME].setupContent()
+                          
     #---------------------------------------------------------------------------
     
     def _setMainModule(self, sourceMainPath):
@@ -122,7 +139,10 @@ class InstallerApplication(QtGui.QApplication):
     def _setupConnections(self):
         
         # setup content after main module set
-        self.installerPages[cw.ExecConfigPageWidget.NAME].mainModuleSet.connect(self.setupContent)
+        self.installerPages[cw.ExecConfigPageWidget.NAME].mainModuleSet.connect(
+            self.setupContent)
+        self.installerPages[cw.ExecConfigPageWidget.NAME].sourceTypeChanged.connect(
+            self.updateContent)
         self.installerPages[cw.DocumentationPageWidget.NAME].previewButton.clicked.connect(
             lambda: self.showDocumentationPreview())
         
@@ -139,7 +159,8 @@ class InstallerApplication(QtGui.QApplication):
         gitConfigPath = os.path.join(userHome, '.gitconfig')
         
         if os.path.exists(gitConfigPath):
-            print('git config file found: "gitConfigPath"')
+            message = 'git config file found: "%s"' % gitConfigPath
+            self.mainWindow.showStatusMessage(message)
             return
         
         QtGui.QMessageBox.critical(

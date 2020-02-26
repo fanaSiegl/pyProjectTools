@@ -62,7 +62,7 @@ class BaseInstallType(BaseParamItem):
     container = INSTALL_TYPES
     TYPE_EXECUTABLE = 'Executable script'
     TYPE_ANSA_BUTTON = 'ANSA user script button'
-    TYPE_META = 'META script'
+    TYPE_META = 'META toolbar'
     TYPE_ANSA_CHECK = 'ANSA check'
     
     INSTALL_PATHS = utils.getInstallTypePaths()['INSTALLATION_PATHS_BASE']
@@ -76,7 +76,7 @@ class BaseInstallType(BaseParamItem):
     DOCUMENTATON_PATH = INSTALL_PATHS['DOCUMENTATON_PATH']
     
     SOURCE_FILE_FILTER = 'pyProject main.py (main.py)'
-    
+        
     def __init__(self, parentInstaller):
         super(BaseInstallType, self).__init__()
         
@@ -92,7 +92,11 @@ class BaseInstallType(BaseParamItem):
     
     def getProjectNameFromSourceFile(self, fileName):
         
-        return os.path.basename(os.path.dirname(os.path.dirname(str(fileName))))
+        if self.parentInstaller.fromRemoteInstallation:
+            return os.path.basename(
+                os.path.dirname(os.path.dirname(os.path.dirname(str(fileName)))))
+        else:
+            return os.path.basename(os.path.dirname(os.path.dirname(str(fileName))))
         
     #---------------------------------------------------------------------------
         
@@ -114,11 +118,14 @@ class BaseInstallType(BaseParamItem):
         self.docuDescription = docuDescription
         self.docString = docString
         
-        self._createRevisionContents()
-                
-        self._createVersionFile()
-        self._createDocumentation()
-        self._cleanUp()
+        if self.parentInstaller.fromRemoteInstallation:
+            self._createContentsFromRemoteInstalation()
+        else:
+            self._createRevisionContents()
+                    
+            self._createVersionFile()
+            self._createDocumentation()
+            self._cleanUp()
         
         self._installAsDefault()
         self._publishDocumentation()
@@ -146,7 +153,18 @@ MODIFIED = ${lastModified}'''
         versionFile = open(os.path.join(self.targetDir, self.VERSION_FILE), 'wt')
         versionFile.write(outputString)
         versionFile.close()
+    
+    #---------------------------------------------------------------------------
+    
+    def _createContentsFromRemoteInstalation(self):
         
+        print('Creating a content in: "%s"' % self.targetDir)
+        
+        if os.path.isdir(self.targetDir): 
+            raise InstallerException('Current revision exists already.')
+             
+        shutil.copytree(self.pyProjectPath, self.targetDir)
+            
     #---------------------------------------------------------------------------
     
     def _createRevisionContents(self):
@@ -216,8 +234,13 @@ MODIFIED = ${lastModified}'''
         if envExecutable is None:
             os.symlink(executable, symLink)
         else:
+            stdOut, _ = utils.runSubprocess('which bash')
+            bashPath = stdOut.strip() 
+            if not bashPath.endswith('bash'):
+                bashPath = '/usr/bin/bash' 
+            
             fo = open(symLink, 'wt')
-            fo.write('#!/usr/bin/bash\n')
+            fo.write('#!%s\n' % bashPath)
             fo.write('%s %s' % (envExecutable, executable))
             fo.close()
             
@@ -522,9 +545,13 @@ class InstallTypeAnsaCheck(BaseInstallType):
     #---------------------------------------------------------------------------
     
     def install(self, pyProjectPath, revision, applicationName, docuGroup, docuDescription, docString):
+# TODO: implement ansaChecksPlistUpdater functionality...
+        if self.parentInstaller.fromRemoteInstallation:
+            raise InstallerException('Installation not implemented for remote check source!')
+        
         
         print('Installing: %s' % self.NAME)
-        
+                
         self.targetDir = os.path.join(self.getTargetDir(), revision)
         self.revision = revision
         self.docuGroup = docuGroup
@@ -623,7 +650,7 @@ class InstallTypeMeta(BaseInstallType):
     def _installAsDefault(self):
         
         print('Releasing to the productive version')
-        
+                
         defaultDir = os.path.join(self.getTargetDir(), self.applicationName, 'default')
         
         if os.path.islink(defaultDir):
@@ -635,8 +662,7 @@ class InstallTypeMeta(BaseInstallType):
                 
         fo = open(defaultFileName, 'wt')
         fo.write('${toolbar_folder}%s/default/bin/toolbar.defaults' % self.applicationName)
-        fo.close()
-    
+        fo.close()    
                 
         
 #==============================================================================
@@ -830,15 +856,22 @@ class VersionItem(BaseInstallerProcedureItem):
     
     def setCurrentTagList(self, pyProjectPath):
         
-        stdout, stderr = utils.runSubprocess('git tag -n9', pyProjectPath)
-        
         self.tagList = list()
-        for line in stdout.splitlines():
-            if not line.startswith('V'):
-                continue
-            parts = line.strip().split()
-            self.tagList.append(parts[0])
-            self.tagInfo[parts[0]] = ' '.join(parts[1:])
+        self.tagInfo = dict()
+        
+        if self.parentInstaller.fromRemoteInstallation:
+            revision, modifiedBy, lastModified = utils.getRemoteVersionInfo(pyProjectPath)
+            self.tagList = [revision]
+            self.tagInfo[revision] = 'AUTOR: %s\nMODIFIED: %s' % (modifiedBy, lastModified)
+        else:
+            stdout, stderr = utils.runSubprocess('git tag -n9', pyProjectPath)
+            
+            for line in stdout.splitlines():
+                if not line.startswith('V'):
+                    continue
+                parts = line.strip().split()
+                self.tagList.append(parts[0])
+                self.tagInfo[parts[0]] = ' '.join(parts[1:])
     
     #---------------------------------------------------------------------------
     

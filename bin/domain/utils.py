@@ -94,12 +94,12 @@ def runSubprocess(command, cwd=None):
         command, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
         cwd=cwd)
     stdout, stderr = process.communicate()
-    
+        
     if stdout is not None:
-        stdout = stdout.decode("ascii",errors="ignore")
+        stdout = stdout.decode("ascii", errors="ignore")
     if stderr is not None:
-        stderr = stderr.decode("ascii",errors="ignore")
-    
+        stderr = stderr.decode("ascii", errors="ignore")
+        
     return stdout, stderr
 
 #==============================================================================
@@ -130,5 +130,50 @@ def getEnvironmentExecutable(configFilePath):
         return config['GENERAL']['EXECUTABLE']
     except Exception as e:
         return None
+
+#==============================================================================
+
+def getLocalLocation():
+         
+    config = configparser.ConfigParser()
     
+    cfgFileName = os.path.join(PATH_INI, CONFIG_FILE)
+    config.read(cfgFileName)
+    
+    return config['GENERAL']['LOCAL_DOCUMENTATION']
+
+#==============================================================================
+
+def getListOfLocations():
+         
+    config = configparser.ConfigParser()
+    
+    cfgFileName = os.path.join(PATH_INI, CONFIG_FILE)
+    config.read(cfgFileName)
+    
+    locations = config['GENERAL']['LOCATIONS'].split(',')
+    return [location.strip() for location in locations]
+
+#==============================================================================
+
+def getDocumentationBrowser():
+         
+    config = configparser.ConfigParser()
+    
+    cfgFileName = os.path.join(PATH_INI, CONFIG_FILE)
+    config.read(cfgFileName)
+    
+    return config['GENERAL']['BROWSER']
+
+#==============================================================================
+
+def getGiuthubSettings():
+         
+    config = configparser.ConfigParser()
+    
+    cfgFileName = os.path.join(PATH_INI, CONFIG_FILE)
+    config.read(cfgFileName)
+    
+    return config['GITHUB']
+
 #==============================================================================

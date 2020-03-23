@@ -334,6 +334,12 @@ class BaseInstallerPageWidget(bw.BaseItemParamSyncWidget):
         self.pageNameLabel.setFont(font)
     
     #--------------------------------------------------------------------------
+    
+    def _setOptionsEnabled(self, state):
+        
+        pass
+        
+    #--------------------------------------------------------------------------
 
     
         
@@ -361,6 +367,18 @@ class ExecConfigPageWidget(BaseInstallerPageWidget):
         groupSource.setLayout(QtGui.QVBoxLayout())
         self.layout.addWidget(groupSource)
          
+        # installation source        
+        sourceTypeLayout = QtGui.QHBoxLayout()
+        groupSource.layout().addLayout(sourceTypeLayout)
+        
+        self.projectSourceComboBox = QtGui.QComboBox()
+        
+        sourceTypeLayout.addWidget(QtGui.QLabel('Source type'))
+        sourceTypeLayout.addWidget(self.projectSourceComboBox)
+        
+        for projectSourceTypeName in bi.PROJECT_SOURCE_TYPES.keys():
+            self.projectSourceComboBox.addItem(projectSourceTypeName)
+            
         # install type
         self.installTypeComboBox = QtGui.QComboBox()
          
@@ -406,18 +424,17 @@ class ExecConfigPageWidget(BaseInstallerPageWidget):
             # register added widget for easier switching
             self.execConfigWidgets[
                 currentWidget.NAME] = self.executableStackedWidget.indexOf(currentWidget)
+    
+    #--------------------------------------------------------------------------
+    
+    def _setOptionsEnabled(self, state):
         
-        # installation source        
-        sourceTypeLayout = QtGui.QHBoxLayout()
-        groupSource.layout().addLayout(sourceTypeLayout)
-        
-        self.localReposRadioButton = QtGui.QRadioButton('Local repository')
-        self.remoteInstallationRadioButton = QtGui.QRadioButton('Remote installation')
-        
-        sourceTypeLayout.addWidget(QtGui.QLabel('Source type'))
-        sourceTypeLayout.addWidget(self.localReposRadioButton)
-        sourceTypeLayout.addWidget(self.remoteInstallationRadioButton)
-
+        self.installTypeComboBox.setEnabled(state)
+        self.browseButton.setEnabled(state)
+        self.sourcePyProjectLineEdit.setEnabled(state)
+        self.sourcePyProjectNameLineEdit.setEnabled(state)
+        self.executableStackedWidget.setEnabled(state)
+            
     #--------------------------------------------------------------------------
     
     def _initiateContent(self):
@@ -435,7 +452,8 @@ class ExecConfigPageWidget(BaseInstallerPageWidget):
         execConfigType = self.executableStackedWidget.currentWidget()
         self._setInstallationType(execConfigType.installationItem)
         
-        self.localReposRadioButton.setChecked(True)
+        self.projectSourceComboBox.setCurrentIndex(
+            self.projectSourceComboBox.findText(self.installer.projectSourceType.NAME))
 
     #--------------------------------------------------------------------------
 
@@ -448,16 +466,51 @@ class ExecConfigPageWidget(BaseInstallerPageWidget):
         
         self._connectLineEditWidget(self.sourcePyProjectNameLineEdit, 'projectName')
         
-        self.remoteInstallationRadioButton.toggled.connect(self._sourceTypeChanged)
-    
+        self.projectSourceComboBox.currentIndexChanged.connect(self._sourceTypeChanged)
+            
     #--------------------------------------------------------------------------
     
     def _sourceTypeChanged(self):
         
-        self.installer.fromRemoteInstallation = self.remoteInstallationRadioButton.isChecked()
+        currentProjectSourceName = str(self.projectSourceComboBox.currentText())
         
+        self.installer.setProjectSourceType(bi.PROJECT_SOURCE_TYPES[currentProjectSourceName])
+        
+        if currentProjectSourceName == bi.MasterReposProjectSourceType.NAME:
+            
+            d = dialogs.MasterRepositorySelectionDialog(self.parentApplication)
+            result = d.exec_()
+            if result == QtGui.QDialog.Accepted:
+                self.parentApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
+                
+                bi.MasterReposProjectSourceType.setTool(d.selectedItems[0])
+                
+                # setup install type
+                self.installTypeComboBox.setCurrentIndex(
+                    self.installTypeComboBox.findText(bi.MasterReposProjectSourceType.getToolInstallType()))
+                
+                
+                mainModulePath = bi.MasterReposProjectSourceType.getMainModulePath()
+                
+                self._checkMainModuleFileName(mainModulePath)
+                self._loadMainModule(mainModulePath)
+                self._setupPyProjectName()
+                self.sourcePyProjectLineEdit.setText(mainModulePath)
+                
+                self._setOptionsEnabled(False)
+                
+                self.parentApplication.restoreOverrideCursor()
+                return            
+            else:
+                self.projectSourceComboBox.setCurrentIndex(
+                    self.projectSourceComboBox.findText(bi.LocalReposProjectSourceType.NAME))
+                
+                self._setOptionsEnabled(True)
+        else:
+            self._setOptionsEnabled(True)
+                                
         self.sourceTypeChanged.emit()
-        self._setupPyProjectName(self.installer.mainModulePath)
+        self._setupPyProjectName()
                         
     #--------------------------------------------------------------------------
     
@@ -499,18 +552,18 @@ class ExecConfigPageWidget(BaseInstallerPageWidget):
         self.sourcePyProjectLineEdit.setText(fileName)
         
         self._loadMainModule(fileName)
-        self._setupPyProjectName(fileName)
+        self._setupPyProjectName()
     
     #--------------------------------------------------------------------------
     
-    def _setupPyProjectName(self, fileName):
+    def _setupPyProjectName(self):
         
         ''' Set project name automatically based on installation type '''
         
         installationItem = self.executableStackedWidget.currentWidget().installationItem
         
         self.sourcePyProjectNameLineEdit.setText(
-            installationItem.getProjectNameFromSourceFile(fileName))
+            installationItem.getProjectNameFromSourceFile())
         
     #--------------------------------------------------------------------------
     
@@ -644,18 +697,22 @@ class DocumentationPageWidget(BaseInstallerPageWidget):
             self.docuGroupCombobox.setEnabled(True)
             self.docuDescription.setEnabled(True)
         
-        # deactivate all in case of remote installation source 
-        if self.installer.fromRemoteInstallation:
-            self.docuGroupCombobox.setEnabled(False)
-            self.docuDescription.setEnabled(False)
-            self.editDocStringButton.setEnabled(False)
+        # deactivate all in case of remote installation source
+        if self.installer.projectSourceType is bi.LocalReposProjectSourceType:
+            self._setOptionsEnabled(True)
         else:
-            self.docuGroupCombobox.setEnabled(True)
-            self.docuDescription.setEnabled(True)
-            self.editDocStringButton.setEnabled(True)
+            self._setOptionsEnabled(False)
         
         self.hasFinished.emit()
 
+    #--------------------------------------------------------------------------
+    
+    def _setOptionsEnabled(self, state):
+        
+        self.docuGroupCombobox.setEnabled(state)
+        self.docuDescription.setEnabled(state)
+        self.editDocStringButton.setEnabled(state)
+        
     #--------------------------------------------------------------------------
 
     def setDocuDescription(self, text):
@@ -812,21 +869,33 @@ class VersionPageWidget(BaseInstallerPageWidget):
 
     #--------------------------------------------------------------------------
     
+    def _setOptionsEnabled(self, state):
+        
+        self.tagCombobox.setEnabled(state)
+        self.commitMessageTextEdit.setEnabled(state)
+        self.utrackedFilesListWidget.setEnabled(state)
+        
+    #--------------------------------------------------------------------------
+    
     def setupContent(self):
         
         self.commitMessageTextEdit.clear()
         
         self._setupTagList()
         
-        # deactivate all in case of remote installation source 
-        if self.installer.fromRemoteInstallation:
-            self.tagCombobox.setEnabled(False)
-        else:
-            self.tagCombobox.setEnabled(True)    
+        # deactivate all in case of remote installation source
+        if self.installer.projectSourceType is bi.LocalReposProjectSourceType:
+            self._setOptionsEnabled(True)
             self._setupProjectStatus()
-        
+        else:
+            self._setOptionsEnabled(False)
+            
+            # enable different version setup
+            if self.installer.projectSourceType is bi.MasterReposProjectSourceType:
+                self.tagCombobox.setEnabled(True)
+                
         self.hasFinished.emit()
-        
+    
     #---------------------------------------------------------------------------
                 
 #==============================================================================

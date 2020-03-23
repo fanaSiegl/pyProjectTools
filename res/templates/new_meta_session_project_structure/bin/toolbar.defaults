@@ -1,0 +1,4 @@
+toolbar start testProject
+toolbar minmaxbuttons off
+toolbar onoff   :toolbar hide all;read ses main.py      |
+

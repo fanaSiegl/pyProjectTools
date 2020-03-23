@@ -10,12 +10,15 @@ import shutil
 import imp
 
 from domain import utils
+from domain import doc_items as di
 
+from interfaces import githubio
 
 #=============================================================================
 
 INSTALL_TYPES = dict()
 INSTALLER_PROCEDURE_ITEMS = dict()
+PROJECT_SOURCE_TYPES = dict()
 
 #==============================================================================
 
@@ -90,14 +93,12 @@ class BaseInstallType(BaseParamItem):
     
     #---------------------------------------------------------------------------
     
-    def getProjectNameFromSourceFile(self, fileName):
+    def getProjectNameFromSourceFile(self):
         
-        if self.parentInstaller.fromRemoteInstallation:
-            return os.path.basename(
-                os.path.dirname(os.path.dirname(os.path.dirname(str(fileName)))))
-        else:
-            return os.path.basename(os.path.dirname(os.path.dirname(str(fileName))))
+        fileName = self.parentInstaller.mainModulePath
         
+        return self.parentInstaller.projectSourceType.getProjectNameFromSourceFile(fileName)
+                
     #---------------------------------------------------------------------------
         
     def updateForInstallation(self):
@@ -118,7 +119,7 @@ class BaseInstallType(BaseParamItem):
         self.docuDescription = docuDescription
         self.docString = docString
         
-        if self.parentInstaller.fromRemoteInstallation:
+        if self.parentInstaller.projectSourceType is RemoteInstallationProjectSourceType:
             self._createContentsFromRemoteInstalation()
         else:
             self._createRevisionContents()
@@ -295,8 +296,10 @@ Revision history graph::
         fo.close()
         
         # create local documentation respecting target environment 
-        envExecutable = utils.getEnvironmentExecutable(
-            os.path.join(self.targetDir, 'ini'))
+#         envExecutable = utils.getEnvironmentExecutable(
+#             os.path.join(self.targetDir, 'ini'))
+        # create local documentation using installer environment 
+        envExecutable = utils.getEnvironmentExecutable(utils.PATH_INI)
         if envExecutable is not None:
             utils.runSubprocess('%s -b html -d %s %s %s' % (
                 os.path.join(os.path.dirname(envExecutable), 'sphinx-build'), 
@@ -367,7 +370,9 @@ Revision history graph::
             os.remove(os.path.join(SPHINX_GLOBAL_DOC_SOURCE, 'index.rst'))
         
         # update tool documentation
-        utils.runSubprocess(os.path.join(self.GENERAL_PRODUCTIVE_VERSION_BIN, 'doc-update'))
+#         utils.runSubprocess(os.path.join(self.GENERAL_PRODUCTIVE_VERSION_BIN, 'doc-update'))
+        documentation = di.ToolDocumentation()
+        documentation.create()
     
     #---------------------------------------------------------------------------
                 
@@ -704,6 +709,15 @@ class InstallationSetupItem(BaseInstallerProcedureItem):
     def updateForInstallation(self):
         
         self.installTypeItem.updateForInstallation()
+        
+        # ensure installer has informatio nabout all tools prior to a new tool being installed
+        if self.parentInstaller.toolGroups is None:
+            documentation = di.ToolDocumentation()            
+            self.parentInstaller.setToolGroups(documentation.getListOfTools())
+    
+    #---------------------------------------------------------------------------
+    
+        
              
 #=============================================================================
 @utils.registerClass
@@ -859,19 +873,21 @@ class VersionItem(BaseInstallerProcedureItem):
         self.tagList = list()
         self.tagInfo = dict()
         
-        if self.parentInstaller.fromRemoteInstallation:
-            revision, modifiedBy, lastModified = utils.getRemoteVersionInfo(pyProjectPath)
-            self.tagList = [revision]
-            self.tagInfo[revision] = 'AUTOR: %s\nMODIFIED: %s' % (modifiedBy, lastModified)
-        else:
-            stdout, stderr = utils.runSubprocess('git tag -n9', pyProjectPath)
-            
-            for line in stdout.splitlines():
-                if not line.startswith('V'):
-                    continue
-                parts = line.strip().split()
-                self.tagList.append(parts[0])
-                self.tagInfo[parts[0]] = ' '.join(parts[1:])
+        self.tagList, self.tagInfo = self.parentInstaller.projectSourceType.getTagInfo(pyProjectPath)
+        
+#         if self.parentInstaller.fromRemoteInstallation:
+#             revision, modifiedBy, lastModified = utils.getRemoteVersionInfo(pyProjectPath)
+#             self.tagList = [revision]
+#             self.tagInfo[revision] = 'AUTOR: %s\nMODIFIED: %s' % (modifiedBy, lastModified)
+#         else:
+#             stdout, stderr = utils.runSubprocess('git tag -n9', pyProjectPath)
+#             
+#             for line in stdout.splitlines():
+#                 if not line.startswith('V'):
+#                     continue
+#                 parts = line.strip().split()
+#                 self.tagList.append(parts[0])
+#                 self.tagInfo[parts[0]] = ' '.join(parts[1:])
     
     #---------------------------------------------------------------------------
     
@@ -1241,6 +1257,125 @@ class MainModuleItem(object):
         
         return False 
                 
+
+#==============================================================================
+
+class BaseProjectSourceType(object):
+    container = PROJECT_SOURCE_TYPES
+    NAME = ''
+    mainModulePath = ''
+    
+    #---------------------------------------------------------------------------
+    @classmethod
+    def getMainModulePath(cls):
         
+        return cls.mainModulePath
+
+    #---------------------------------------------------------------------------
+    @classmethod
+    def getProjectNameFromSourceFile(cls, fileName):
+        
+        return os.path.basename(os.path.dirname(os.path.dirname(str(fileName))))
+    
+    #---------------------------------------------------------------------------
+    @classmethod
+    def getTagInfo(cls, pyProjectPath):        
+
+        tagList = list()
+        tagInfo = dict()
+        
+        stdout, stderr = utils.runSubprocess('git tag -n9', pyProjectPath)
+        
+        for line in stdout.splitlines():
+            if not line.startswith('V'):
+                continue
+            parts = line.strip().split()
+            tagList.append(parts[0])
+            tagInfo[parts[0]] = ' '.join(parts[1:])
+        
+        return tagList, tagInfo
+    
+    #---------------------------------------------------------------------------
+    @classmethod
+    def cleanUp(cls): pass
+    
+#==============================================================================
+@utils.registerClass
+class LocalReposProjectSourceType(BaseProjectSourceType):
+    
+    NAME = 'Local repository'
+                
+#==============================================================================
+@utils.registerClass
+class MasterReposProjectSourceType(BaseProjectSourceType):
+    
+    NAME = 'Master repository'
+    
+    tool = None
+    
+    #---------------------------------------------------------------------------
+    @classmethod
+    def setTool(cls, tool):
+        
+        cls.tool = tool
+        
+        targetPath = githubio.Githubio.cloneProject(tool.name)
+                        
+        cls.mainModulePath = os.path.join(targetPath, tool.name, 'bin', 'main.py') 
+                    
+    #---------------------------------------------------------------------------
+    @classmethod
+    def getToolInstallType(cls):
+        
+        if cls.tool is not None:
+            if cls.tool.parentGroup.name == 'ANSA_tools':
+                return InstallTypeAnsaButton.NAME
+            elif cls.tool.parentGroup.name == 'META_tools':
+                return InstallTypeMeta.NAME
+            else:
+                return InstallTypeExecutable.NAME
+            
+        else:
+            return InstallTypeExecutable.NAME
+    
+    #---------------------------------------------------------------------------
+    @classmethod
+    def cleanUp(cls):
+                
+        tempDir = os.path.dirname(os.path.dirname(
+            os.path.dirname(cls.getMainModulePath())))
+                
+        if os.path.exists(tempDir):
+            print('Removing temporary repository in: "%s"' % tempDir)
+            try:
+                os.rmdir(tempDir)
+            except OSError as e:
+                print('Failed to remove temporary directory: "%s"' % tempDir)
+    
+#==============================================================================
+@utils.registerClass
+class RemoteInstallationProjectSourceType(BaseProjectSourceType):
+    
+    NAME = 'Remote installation'                    
+    
+    #---------------------------------------------------------------------------
+    @classmethod
+    def getProjectNameFromSourceFile(cls, fileName):
+        
+        return os.path.basename(
+            os.path.dirname(os.path.dirname(os.path.dirname(str(fileName)))))
+        
+    #---------------------------------------------------------------------------
+    @classmethod
+    def getTagInfo(cls, pyProjectPath):
+        
+        tagInfo = dict()
+         
+        revision, modifiedBy, lastModified = utils.getRemoteVersionInfo(pyProjectPath)
+        tagList = [revision]
+        tagInfo[revision] = 'VERSION: %s\nAUTOR: %s\nMODIFIED: %s' % (revision, modifiedBy, lastModified)
+        
+        return tagList, tagInfo
+    
 #=============================================================================
 

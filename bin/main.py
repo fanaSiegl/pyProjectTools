@@ -6,7 +6,7 @@ pyProjectInstaller
 ==================
 
 Python script for pyProject installation. According to the given 
-installation type (execulable script, ANSA button, ANSA check, META button) handles
+installation type (executable script, ANSA button, ANSA check, META button) handles
 all corresponding procedures:
 
 * installs pyProject to the default project structure

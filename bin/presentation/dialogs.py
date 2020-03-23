@@ -13,7 +13,9 @@ from PyQt4 import QtCore, QtGui
 
 from domain import utils
 from domain import base_items as bi
+from domain import doc_items as di
 from presentation import base_widgets as bw
+from presentation import models
 
 #===============================================================================
 
@@ -258,3 +260,152 @@ class InstallerCheckerReportDialog(QtGui.QDialog):
                 item.setIcon(self.style().standardIcon(QtGui.QStyle.SP_MessageBoxCritical))
             self.reportListWidget.addItem(item)
             
+
+#==============================================================================
+
+class MasterRepositorySelectionDialog(QtGui.QDialog):
+
+    WIDTH = 1200
+    HEIGHT = 800
+    
+    TITLE = 'IDIADA tools master repository'
+    
+    def __init__(self, parentApplication):
+        super(MasterRepositorySelectionDialog, self).__init__()
+        
+        self.parentApplication = parentApplication
+        self.installer = self.parentApplication.installer
+        self.loadingThread = LoadMasterRepositoryProjectsThread(self)
+        self.selectedItems = list()
+        
+        self._setWindowGeometry()
+        self._setupWidgets()
+        self._setupConnections()
+        
+        self.loadingThread.start()
+                
+    #---------------------------------------------------------------------------
+
+    def _setWindowGeometry(self):
+        
+        self.setWindowTitle(self.TITLE)
+        self.setWindowIcon(QtGui.QIcon(os.path.join(utils.PATH_ICONS, 'view-web-browser-dom-tree.png')))
+
+        self.resize(self.WIDTH, self.HEIGHT)
+        self.move(QtGui.QApplication.desktop().screen().rect().center()- self.rect().center())
+    
+    #---------------------------------------------------------------------------
+
+    def _setupConnections(self):
+                
+        self.buttonBox.accepted.connect(self.accept)
+        self.buttonBox.rejected.connect(self.reject)
+        self.buttonBox.helpRequested.connect(self._openDocumentation)
+        
+        self.loadingThread.dataLoaded.connect(self._setupContent)
+                
+    #---------------------------------------------------------------------------
+
+    def _setupWidgets(self):
+        
+        self.setLayout(QtGui.QVBoxLayout())
+                
+        self.toolListTreeView = QtGui.QTreeView()
+        self.layout().addWidget(self.toolListTreeView)
+                
+        # buttons
+        frame = QtGui.QFrame()
+        frame.setFrameShape(QtGui.QFrame.HLine)
+        self.layout().addWidget(frame)
+         
+        self.buttonBox = QtGui.QDialogButtonBox()
+        self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Ok|QtGui.QDialogButtonBox.Cancel)
+        self.buttonBox.addButton('Open documentation', QtGui.QDialogButtonBox.HelpRole)
+
+        self.layout().addWidget(self.buttonBox)
+    
+    #---------------------------------------------------------------------------
+
+    def _setupContent(self, toolGroups):
+        
+        # setup available tools
+        self.installer.setToolGroups(toolGroups)
+        
+        toolModel = models.BaseTreeModel(toolGroups)
+        
+        self.toolListTreeView.setModel(toolModel)
+        
+        self.toolListTreeView.expandAll()
+        self.toolListTreeView.resizeColumnToContents(0)
+    
+    #---------------------------------------------------------------------------
+    
+    def _openDocumentation(self):
+        
+        di.ToolDocumentation.show()
+    
+    #---------------------------------------------------------------------------
+    
+    def accept(self):
+        
+        self.selectedItems = self.getSelectedItems()
+        
+        if len(self.selectedItems) == 0:            
+            QtGui.QMessageBox.critical(
+                self, self.TITLE, 'No project selected!')
+        else:
+            answer = QtGui.QMessageBox.question(
+                self, self.TITLE,
+                'Are you sure to download this tool from master repository?',
+                QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)
+            if answer == QtGui.QMessageBox.No:
+                return
+            
+            super(MasterRepositorySelectionDialog, self).accept()
+    
+    #--------------------------------------------------------------------------
+
+    def getSelectedItems(self):
+         
+        selectedItems = list()
+        for index in self.toolListTreeView.selectedIndexes():
+            item = index.model().itemFromIndex(index)
+            if index.column() > 0:
+                continue
+            if hasattr(item, 'dataItem') and item.dataItem is not None:
+                selectedItems.append(item.dataItem)
+        
+        return selectedItems
+
+
+#==============================================================================
+
+class LoadMasterRepositoryProjectsThread(QtCore.QThread):
+    
+    dataLoaded = QtCore.pyqtSignal(object)
+    
+    def __init__(self, parentDialog):
+        super(LoadMasterRepositoryProjectsThread, self).__init__()
+        
+        self.parentDialog = parentDialog 
+        self.parentApplication = parentDialog.parentApplication
+        
+        self.started.connect(
+            lambda: self.parentApplication.setOverrideCursor(
+                QtGui.QCursor(QtCore.Qt.WaitCursor)))
+        self.finished.connect(
+            self.parentApplication.restoreOverrideCursor)
+            
+    #--------------------------------------------------------------------------
+    
+    def run(self):
+        
+        documentation = di.ToolDocumentation()
+        toolGroups = documentation.getListOfTools()
+        
+        self.dataLoaded.emit(toolGroups)
+        
+
+#==============================================================================
+        
+                    

@@ -3,13 +3,13 @@
 
 import os
 import sys
-import traceback
-import getpass
-import socket
-import subprocess
+import copy
 
 from domain import utils
 from domain import base_items as bi
+from domain import doc_items as di
+
+from interfaces import githubio
     
 #=============================================================================
 
@@ -23,7 +23,8 @@ class Installer(object):
                 
         self.mainModulePath = ''
         self.pyProjectPath = ''
-        self.fromRemoteInstallation = False
+        self.projectSourceType = bi.LocalReposProjectSourceType
+        self.toolGroups = None
         
         self._initialiseInstallationItems()
     
@@ -37,7 +38,7 @@ class Installer(object):
     #---------------------------------------------------------------------------
     
     def install(self):
-
+            
         ''' This assumes that all checks have been passed so the new revision
         is made just when there was a new tag required. New revision is
         omitted otherwise.'''
@@ -48,7 +49,7 @@ class Installer(object):
             procedureItem.updateForInstallation()   
         
         # create revision only if source project type is local revision
-        if not self.fromRemoteInstallation:
+        if self.projectSourceType is bi.LocalReposProjectSourceType:
             tagName = self.procedureItems[bi.VersionItem.NAME].tagName
             tagList = self.procedureItems[bi.VersionItem.NAME].tagList
             if tagName not in tagList:              
@@ -67,9 +68,12 @@ class Installer(object):
         
         # create master repository if not installing ANSA check
         if self.getCurrentInstallType() != bi.BaseInstallType.TYPE_ANSA_CHECK \
-            and not self.fromRemoteInstallation:
+            and self.projectSourceType is not bi.RemoteInstallationProjectSourceType:
             
             self._createMasterRepository()
+        
+        # clean up temporary data
+        self.projectSourceType.cleanUp()
     
     #---------------------------------------------------------------------------
     
@@ -89,6 +93,23 @@ class Installer(object):
             self.mainModulePath = mainModulePath
             self.pyProjectPath = os.path.dirname(os.path.dirname(mainModulePath))
     
+    #---------------------------------------------------------------------------
+    
+    def setProjectSourceType(self, sourceType):
+        
+        self.projectSourceType = sourceType
+    
+    #---------------------------------------------------------------------------
+    
+    def setToolGroups(self, toolGroups):
+        
+        self.toolGroups = copy.deepcopy(toolGroups)
+        
+        toolNames = list()
+        for tools in self.toolGroups.values():
+            toolNames.extend([tool.name for tool in tools])
+        self.availableTools = set(toolNames)
+            
     #---------------------------------------------------------------------------
     
     def getCurrentInstallType(self):
@@ -137,6 +158,36 @@ class Installer(object):
         
         utils.runSubprocess('git checkout master', cwd=masterReposPath)
         utils.runSubprocess('git fetch --tag %s' % localReposPath, cwd=masterReposPath)
+        
+        # synchronise with github if not there already
+        if self.projectSourceType is not bi.MasterReposProjectSourceType:
+                        
+            if projectName in self.availableTools:
+                print('Project exists in master repository')
+                
+                githubio.Githubio.synchroniseProject(projectName, masterReposPath)
+            else:
+                print('Creating a new project in master repository')
+                
+                githubio.Githubio.createProject(projectName, masterReposPath)
+                
+                # add files to doc repository
+                docSourceDir = os.path.join(di.SPHINX_SOURCE,
+                    utils.getInstallTypePaths()['GENERAL']['LOCAL_DOCUMENTATION'],
+                    self.procedureItems[bi.DocumetationItem.NAME].docuGroup.replace(' ', '_'),
+                    projectName) + os.path.sep + '*'
+                
+                print('Adding new documentation files to doc repository: "%s"' % docSourceDir)
+                
+                utils.runSubprocess('git add %s' % docSourceDir, cwd=di.SPHINX_SOURCE)
+        
+        # synchronise documentation
+        di.ToolDocumentation.commitToolAdded('Tool: %s (%s) installed.' % (
+            projectName, self.procedureItems[bi.VersionItem.NAME].tagName))
+    
+    #---------------------------------------------------------------------------
+    
+ 
         
         
 #=============================================================================

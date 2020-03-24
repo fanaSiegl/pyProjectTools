@@ -372,33 +372,33 @@ Indices and tables
             os.path.join(DOCUMENTATON_PATH, 'idiada_tools_doc.html')))
     
     #---------------------------------------------------------------------------
-#     @classmethod
-#     def getListOfTools(cls):
-    def getListOfTools(self):
+    @classmethod
+    def initiateFromGithub(cls):
         
-#         ToolLocation.initiate()
-#         
-#         for groupName in sorted(ToolGroup.tools.keys()):            
-#              
-#             print(groupName)
-#             tools = ToolGroup.getListOfTools(groupName)
-#             for tool in tools:
-#                 print(tool.isLocal(), tool.name, tool.version(), tool.getOneLineDescription())
         
-        return self.toolGroups
+        if os.path.exists(DOCUMENTATON_PATH):
+            utils.runSubprocess('git pull origin master', DOCUMENTATON_PATH)
+        else:
+            githubio.Githubio.cloneProject(
+                'idiada_tools_doc', os.path.dirname(DOCUMENTATON_PATH))
+    
+    #---------------------------------------------------------------------------
+    @classmethod
+    def getListOfTools(cls):
+        
+        cls.synchronise()
+        
+        documentation = cls()
+        
+        return documentation.toolGroups
     
     #---------------------------------------------------------------------------
     @classmethod
     def checkUpdated(cls):
-        
-#         cwd ='/data/fem/+software/SKRIPTY/tools/repos/tool_documentation'
-#         cwd = '/data/fem/users/siegl/eclipse/python_test/test_remote_origin/idiada_tools_doc'
-#         cwd = '/data/fem/users/siegl/eclipse/python_test/test_remote_origin/test_sync/idiada_tools_doc'
-        
+                
         stdout, _ = utils.runSubprocess('git log --oneline', DOCUMENTATON_PATH)
         commitCount = len(stdout.strip().split('\n'))
         
-#         utils.runSubprocess('hub sync', DOCUMENTATON_PATH)
         cls.synchronise()
         
         stdout, _ = utils.runSubprocess('git log --oneline', DOCUMENTATON_PATH)
@@ -406,7 +406,7 @@ Indices and tables
         newCommitCount = len(stdout.strip().split('\n'))
         
         if commitCount != newCommitCount:
-            print('Updated needed')
+            print('Documentation update found in the master repository.')
             return True
         else:
             print('Up-to-date')
@@ -416,8 +416,9 @@ Indices and tables
     @classmethod
     def synchronise(cls):
         
-        githubio.Githubio.synchroniseProject(
-            os.path.basename(DOCUMENTATON_PATH), DOCUMENTATON_PATH)
+        print('Synchronising tool documentation')
+        
+        githubio.Githubio.syncProject(DOCUMENTATON_PATH)
     
     #---------------------------------------------------------------------------
     @classmethod
@@ -425,7 +426,8 @@ Indices and tables
                 
         utils.runSubprocess('git commit -a -m "%s"' % commitMessage, DOCUMENTATON_PATH)
         
-        cls.synchronise()
+        githubio.Githubio.pushProject(
+            os.path.basename(DOCUMENTATON_PATH), DOCUMENTATON_PATH)
             
 #=============================================================================
 

@@ -119,6 +119,9 @@ class Githubio(object):
          
         utils.runSubprocess('%s' % cloneFileName, targetPath)
         
+        if os.path.isfile(cloneFileName):
+            os.remove(cloneFileName)
+        
         return targetPath
         
     #---------------------------------------------------------------------------
@@ -143,7 +146,7 @@ class Githubio(object):
     
     #---------------------------------------------------------------------------
     @classmethod
-    def synchroniseProject(cls, projectName, projectPath):
+    def pushProject(cls, projectName, projectPath):
         
         templateString = Template(CONTENT_SYNC)
         content = templateString.safe_substitute(
@@ -160,6 +163,13 @@ class Githubio(object):
         utils.runSubprocess('%s' % createFileName, projectPath)
         
         os.remove(createFileName)
+    
+    #---------------------------------------------------------------------------
+    @classmethod
+    def syncProject(cls, projectPath):
+        
+        utils.runSubprocess('%s sync' % HUB_EXECUTABLE, projectPath)
+        
 
             
 #=============================================================================

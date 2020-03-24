@@ -2,9 +2,54 @@
 # -*- coding: utf-8 -*-
 
 '''
+pyProjectTools
+==============
+
+Is a package of tools which are supposed to be used to create, install and document python-based scripts.
+    
+newPyProject
+============
+
+Creates a new python project template according to the given target project type. 
+This project is supposed to be installed into standard project structure using pyProjectInstaller.  
+
+* creates a default project structure
+* creates a default sphinx documentation which will be generated from the documentation string of the main.py file
+* initiates a git repository
+
+Usage
+-----
+
+usage::
+
+    newPyProject [-h] [-wrap script_path] [-ansaCheck] [-ansaButton] [-metaSession] projectName [project_path]
+    
+    positional arguments:
+      projectName        Project name.
+      project_path       New project location. (Default=Current directory)
+
+    optional arguments:
+      -h, --help         show this help message and exit
+      -wrap script_path  Automatically wraps given executable script with a
+                     newPyProject of given name. This project can be
+                     directly installed using pyProjectInstaller.
+      -ansaCheck         Creates an ANSA check template. Please be aware that in
+                     order to use pyProjectInstaller the new created check
+                     file name must contain a prefix: check_*.py
+      -ansaButton        Creates an ANSA user script button template. This project
+                     can be directly added to ANSA using pyProjectInstaller.
+      -metaSession       Creates a META session template. This project can be
+                     directly added to META using pyProjectInstaller.
+
+
+
 pyProjectInstaller
 ==================
 
+.. image:: images/pyProjectInstaller_01.png
+    :width: 400pt
+    :align: center
+    
 Python script for pyProject installation. According to the given 
 installation type (executable script, ANSA button, ANSA check, META button) handles
 all corresponding procedures:
@@ -20,18 +65,39 @@ usage::
 
     pyProjectInstaller 
 
-    
 It is possible to use either "Local repository" or "Remote installation" 
 as a source for installation.
     
     * Local repository type - pyProject to be installed has its repository (by script development)
     * Remote installation type - pyProject to be installed has been received from other business unit (by installation of an existing tool)
 
+
+doc
+===
+
+Tool that generates a IDIADA tool documentation overview using SPHINX
+
+Usage
+-----
+
+usage::
+
+    doc [-h] [-init]
+
+    optional arguments:
+      -h, --help  show this help message and exit
+      -init       Clones existing IDIADA tool documentation files from github
+                  master repository and sets remote origin.
+      -update     Creates documentation html content from source documentation
+                  files.
+      -sync       Synchonises source documentation files with the master
+                  repository.
+
 '''
 
 #===============================================================================
 
-APPLICATION_NAME = 'pyProjectInstaller'
+APPLICATION_NAME = 'pyProjectTools'
 DOCUMENTATON_GROUP = 'development tools'
 DOCUMENTATON_DESCRIPTION = 'script for new python project installation.'
 
@@ -39,247 +105,47 @@ DOCUMENTATON_DESCRIPTION = 'script for new python project installation.'
 
 import os
 import sys
-import traceback
-import getpass
-import socket
-
-from PyQt4 import QtCore, QtGui
 
 from domain import utils
-from domain import base_items as bi
-from domain import comp_items as ci
-from presentation import base_widgets as bw
-from presentation import comp_widgets as cw
-from presentation import dialogs
+
+import doc
+import newPyProject
+import pyProjectInstaller
 
 #=============================================================================
 
-def saveExecute(method, *args):
+class PyProjectTools(object):
     
-    def wrapper(*args):
-        
-        parentApplication = args[0]
-        parentApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
-        try:
-            method(*args)
-        except Exception as e:
-            traceback.print_exc()
-            
-            QtGui.QMessageBox.critical(
-                parentApplication.mainWindow, '%s' % parentApplication.APPLICATION_NAME,
-                str(e))
-        
-        parentApplication.restoreOverrideCursor()
-        
-    return wrapper
+    '''
+pyProjectTools
+==============
 
-#=============================================================================
-
-class PyProjectInstallerException(Exception): pass
-
-#=============================================================================
-
-class InstallerApplication(QtGui.QApplication):
+Description ...
     
-    APPLICATION_NAME = 'newPyProject Installer'
+    '''
+    
+    APPLICATION_NAME = 'pyProjectTools'
     
     def __init__(self):
         
-        super(InstallerApplication, self).__init__(sys.argv)
+        os.system('%s %s &' % (
+            utils.getDocumentationBrowser(),
+            os.path.join(utils.PATH_DOC, 'documentation.html')))
         
-        self.revision, self.modifiedBy, self.lastModified = utils.getVersionInfo()
-        self.userName = getpass.getuser()
-        self.machine = socket.gethostname()
-        self.installer = ci.Installer()
+        revision, modifiedBy, lastModified = utils.getVersionInfo()
         
-        self.workDir = os.getcwd()
-        self.sourceMainPath = ''
+        print('%s (%s)' % (self.APPLICATION_NAME, revision))
+        print('MODIFIED BY: %s' % modifiedBy)
+        print('LAST MODIFIED: %s' % lastModified)
         
-        self.mainWindow = MainWindow(self)
-        self.installerPages = self.mainWindow.centralWidget().installerPages
-        
-        self._setupConnections()
-        
-        self.mainWindow.show()
+        print(PyProjectTools.__doc__)
+       
+        print(newPyProject.__doc__)
+        print(pyProjectInstaller.__doc__)
+        print(doc.__doc__)
             
-        self._checkGitConfig()
-            
-    #---------------------------------------------------------------------------
-    @saveExecute
-    def setupContent(self, sourceMainPath):
-        
-        self._setMainModule(sourceMainPath)
-        self.installer.setMainModule(self.sourceMainPath)
-        
-        self.installerPages[cw.ExecConfigPageWidget.NAME].setupContent()
-        self.installerPages[cw.DocumentationPageWidget.NAME].setupContent()
-        self.installerPages[cw.VersionPageWidget.NAME].setupContent()
-    
-    #---------------------------------------------------------------------------
-    @saveExecute
-    def updateContent(self):
-        
-        if len(self.installer.mainModulePath) == 0:
-            return
-                
-        self.installerPages[cw.ExecConfigPageWidget.NAME].setupContent()
-        self.installerPages[cw.DocumentationPageWidget.NAME].setupContent()
-        self.installerPages[cw.VersionPageWidget.NAME].setupContent()
-                          
-    #---------------------------------------------------------------------------
-    
-    def _setMainModule(self, sourceMainPath):
-        
-        self.sourceMainPath = str(sourceMainPath)
-
-        self.workDir = os.path.dirname(self.sourceMainPath)
-
-    #--------------------------------------------------------------------------
-
-    def _setupConnections(self):
-        
-        # setup content after main module set
-        self.installerPages[cw.ExecConfigPageWidget.NAME].mainModuleSet.connect(
-            self.setupContent)
-        self.installerPages[cw.ExecConfigPageWidget.NAME].sourceTypeChanged.connect(
-            self.updateContent)
-        self.installerPages[cw.DocumentationPageWidget.NAME].previewButton.clicked.connect(
-            lambda: self.showDocumentationPreview())
-        
-        self.mainWindow.centralWidget().pageContainerWidget.installReady.connect(
-            self.runInstallation)
-        
-        self.mainWindow.centralWidget().closeButton.clicked.connect(self.closeAllWindows)
-               
-    #--------------------------------------------------------------------------
-    
-    def _checkGitConfig(self):
-        
-        userHome = os.path.expanduser("~")
-        gitConfigPath = os.path.join(userHome, '.gitconfig')
-        
-        if os.path.exists(gitConfigPath):
-            message = 'git config file found: "%s"' % gitConfigPath
-            self.mainWindow.showStatusMessage(message)
-            return
-        
-        QtGui.QMessageBox.critical(
-            self.mainWindow, '%s' % self.APPLICATION_NAME,
-            'This is the first usage of git and it needs to be configured.\nPlease provide a basic user information.')
-        
-        userName = self.userName
-        email = ''
-        
-        newUserName, ok = QtGui.QInputDialog.getText(self.mainWindow, 'git config',
-            'Please provide your name for git setup (name surname).')
-        if ok:
-            userName = newUserName
-            
-        newEmail, ok = QtGui.QInputDialog.getText(self.mainWindow, 'git config',
-            'Please provide your email for git setup (name.surname@idiada.cz).')
-        if ok:
-            email = newEmail
-        
-        configString = '''[user]
-    name = %s
-    email = %s
-
-[core]
-    editor = kwrite''' % (userName, email)
-        
-        fo = open(gitConfigPath, 'wt')
-        fo.write(configString)
-        fo.close()
-        
-        QtGui.QMessageBox.information(
-            self.mainWindow, '%s' % self.APPLICATION_NAME,
-            'git config file created in:\n"%s"\n\n%s' % (gitConfigPath, configString))
-
-    #--------------------------------------------------------------------------
-    @saveExecute
-    def showDocumentationPreview(self):
-        
-        # create temporary documentation
-        self.dialog = dialogs.DocuPreviewDialog(self)
-        self.dialog.show()
-        
-    #--------------------------------------------------------------------------
-    @saveExecute
-    def runInstallation(self):
-        
-        self.installer.install()
-        
-        self.restoreOverrideCursor()
-        
-        QtGui.QMessageBox.information(
-            self.mainWindow, self.APPLICATION_NAME, 'Installation completed!')
-
-#===============================================================================
-
-class MainWindow(QtGui.QMainWindow):
-
-    WIDTH = 600
-    HEIGHT = 400
-
-    STATUSBAR_MESSAGE_DURATION = 5000
-    
-    NEW_TOOL_GROUP_TEXT = '+ add a new group'
-    
-    def __init__(self, parentApplication):
-        super(MainWindow, self).__init__()
-
-        self.parentApplication = parentApplication
-        self.permanentWidget = None
-        
-        self._setupWidgets()
-
-        self._setWindowGeometry()
-    
-    #---------------------------------------------------------------------------
-
-    def _setWindowGeometry(self):
-        
-        self.setWindowTitle('%s (%s)' % (
-            self.parentApplication.APPLICATION_NAME, self.parentApplication.revision))
-        
-#         self.setWindowIcon(QtGui.QIcon(os.path.join(utils.PATH_ICONS, 'view-web-browser-dom-tree.png')))
-
-        self.resize(self.WIDTH, self.HEIGHT)
-        self.move(QtGui.QApplication.desktop().screen().rect().center()- self.rect().center())
-        
-        #self.setWindowState(QtCore.Qt.WindowMaximized)
-
-    #--------------------------------------------------------------------------
-
-    def _setupWidgets(self):
-                
-#         self.statusBar()
-        
-        self.setCentralWidget(cw.CentralWidget(self))
-        
-    #--------------------------------------------------------------------------
-
-    def showStatusMessage(self, message):
-
-        self.statusBar().showMessage(message, self.STATUSBAR_MESSAGE_DURATION)
-      
-    #--------------------------------------------------------------------------
-
-    #def closeEvent(self, event):
-        
-        #self.parentApplication.saveSettings()
-        
-        #event.accept()
-
-#=============================================================================
-
-def main():
-
-    app = InstallerApplication()    
-    sys.exit(app.exec_())
-    
 #=============================================================================
 
 if __name__ == '__main__':
     
-    main()
+    PyProjectTools()

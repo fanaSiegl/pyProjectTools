@@ -165,7 +165,7 @@ class Installer(object):
             if projectName in self.availableTools:
                 print('Project exists in master repository')
                 
-                githubio.Githubio.synchroniseProject(projectName, masterReposPath)
+                githubio.Githubio.pushProject(projectName, masterReposPath)
             else:
                 print('Creating a new project in master repository')
                 

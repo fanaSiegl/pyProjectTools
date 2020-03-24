@@ -399,11 +399,8 @@ class LoadMasterRepositoryProjectsThread(QtCore.QThread):
     #--------------------------------------------------------------------------
     
     def run(self):
-        
-        documentation = di.ToolDocumentation()
-        toolGroups = documentation.getListOfTools()
-        
-        self.dataLoaded.emit(toolGroups)
+                
+        self.dataLoaded.emit(di.ToolDocumentation.getListOfTools())
         
 
 #==============================================================================

@@ -1,9 +1,5 @@
-newPyProject documentation
-==========================
-
-.. image:: images/pyProjectInstaller_01.png
-	:width: 400pt
-	:align: center
+pyProjectTools documentation
+============================
 
 .. toctree::
    :maxdepth: 2

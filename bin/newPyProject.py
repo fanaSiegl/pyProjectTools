@@ -4,8 +4,9 @@
 '''
 newPyProject
 ============
-
-Python script for the new python project creation.
+ 
+Creates a new python project template according to the given target project type. 
+This project is supposed to be installed into standard project structure using pyProjectInstaller.  
 
 * creates a default project structure
 * creates a default sphinx documentation which will be generated from the documentation string of the main.py file

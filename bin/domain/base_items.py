@@ -242,7 +242,7 @@ MODIFIED = ${lastModified}'''
             
             fo = open(symLink, 'wt')
             fo.write('#!%s\n' % bashPath)
-            fo.write('%s %s' % (envExecutable, executable))
+            fo.write('%s %s $@\n' % (envExecutable, executable))
             fo.close()
             
         os.chmod(symLink, 0o775)
@@ -710,10 +710,9 @@ class InstallationSetupItem(BaseInstallerProcedureItem):
         
         self.installTypeItem.updateForInstallation()
         
-        # ensure installer has informatio nabout all tools prior to a new tool being installed
-        if self.parentInstaller.toolGroups is None:
-            documentation = di.ToolDocumentation()            
-            self.parentInstaller.setToolGroups(documentation.getListOfTools())
+        # ensure installer has information about all tools prior to a new tool being installed
+        if self.parentInstaller.toolGroups is None:         
+            self.parentInstaller.setToolGroups(di.ToolDocumentation.getListOfTools())
     
     #---------------------------------------------------------------------------
     

@@ -249,7 +249,6 @@ class BaseInstallerPageWidget(bw.BaseItemParamSyncWidget):
         
         self.installationItem = self.installer.procedureItems[
             self.NAME]
-#             bi.INSTALLER_PROCEDURE_ITEMS[]()
         
         self.finished = False
         
@@ -839,27 +838,8 @@ class VersionPageWidget(BaseInstallerPageWidget):
     #---------------------------------------------------------------------------
     
     def _setupProjectStatus(self):
-        
-        stdout, stderr = utils.runSubprocess('git status',
-            cwd=os.path.dirname(
-            os.path.dirname(self.parentApplication.installer.mainModulePath)))
-                
-        untrackedFiles = list()
-        untrackedBlock = False
-        for line in stdout.splitlines():
-            parts = line.split()
-            if line.startswith('# Untracked files:'):
-                untrackedBlock = True
-                continue
-            elif not line.startswith('#'):
-                continue
-            # skip empty line
-            if len(parts) <= 1:
-                continue
-            elif line.startswith('#   (use "git add <file>'):
-                continue
-            if untrackedBlock:
-                untrackedFiles.append(line.replace('#','').strip())
+         
+        untrackedFiles = self.installer.getUntrackedFiles()
         
         self.utrackedFilesListWidget.clear()
         

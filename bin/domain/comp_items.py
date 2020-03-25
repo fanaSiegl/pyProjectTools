@@ -72,6 +72,8 @@ class Installer(object):
             
             self._createMasterRepository()
         
+        self._syncGitHubMasterRepository()
+        
         # clean up temporary data
         self.projectSourceType.cleanUp()
     
@@ -118,6 +120,14 @@ class Installer(object):
     
     #---------------------------------------------------------------------------
     
+    def getUntrackedFiles(self):
+            
+        untrackedFiles = self.procedureItems[bi.InstallationSetupItem.NAME].installTypeItem.getUntrackedFiles()
+        
+        return untrackedFiles
+    
+    #---------------------------------------------------------------------------
+    
     def _createNewRevision(self, tagName, commitMessage, newFileList):
                 
         # add files
@@ -159,6 +169,14 @@ class Installer(object):
         utils.runSubprocess('git checkout master', cwd=masterReposPath)
         utils.runSubprocess('git fetch --tag %s' % localReposPath, cwd=masterReposPath)
         
+    #---------------------------------------------------------------------------
+    
+    def _syncGitHubMasterRepository(self):
+        
+        reposPath = self.procedureItems[bi.InstallationSetupItem.NAME].installTypeItem.REPOS_PATH
+        projectName = self.procedureItems[bi.InstallationSetupItem.NAME].projectName
+        masterReposPath = os.path.join(reposPath, projectName)
+        
         # synchronise with github if not there already
         if self.projectSourceType is not bi.MasterReposProjectSourceType:
                         
@@ -184,7 +202,7 @@ class Installer(object):
         # synchronise documentation
         di.ToolDocumentation.commitToolAdded('Tool: %s (%s) installed.' % (
             projectName, self.procedureItems[bi.VersionItem.NAME].tagName))
-    
+        
     #---------------------------------------------------------------------------
     
  

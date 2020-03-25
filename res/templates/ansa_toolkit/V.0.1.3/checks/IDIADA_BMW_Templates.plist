@@ -1,0 +1,3439 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plist filecontents="Templates">
+  <dict>
+    <key>Structure of the template name: AUTOMOBILKA_SOLVER_LOADCASE/CAR</key>
+    <dict>
+      <key>checks</key>
+      <array/>
+      <key>info</key>
+      <string/>
+      <key>errors</key>
+      <array/>
+    </dict>
+    <key>BMW_ABAQUS</key>
+    <dict>
+      <key>checks</key>
+      <array>
+        <dict>
+          <key>name</key>
+          <string>Closed Tie Loops</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict/>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Duplicate</string>
+          <key>executionMode</key>
+          <int>4</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>Separate by</key>
+            <dict>
+              <key>value</key>
+              <int>0</int>
+            </dict>
+            <key>Report material null elements</key>
+            <dict>
+              <key>value</key>
+              <false/>
+            </dict>
+            <key>Report semi-duplicate solids</key>
+            <dict>
+              <key>value</key>
+              <false/>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Free</string>
+          <key>executionMode</key>
+          <int>4</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>Consider nodes with mass as free nodes</key>
+            <dict>
+              <key>value</key>
+              <true/>
+            </dict>
+            <key>Do not report free nodes attached to non-visible entities</key>
+            <dict>
+              <key>value</key>
+              <true/>
+            </dict>
+            <key>Consider auxiliary nodes as free nodes</key>
+            <dict>
+              <key>value</key>
+              <true/>
+            </dict>
+            <key>Do not report master nodes of rigid bodies</key>
+            <dict>
+              <key>value</key>
+              <true/>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Mesh: Negative Volume</string>
+          <key>executionMode</key>
+          <int>4</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>Calculation Method</key>
+            <dict>
+              <key>value</key>
+              <int>1</int>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Penetration:Intersections</string>
+          <key>executionMode</key>
+          <int>4</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>Check same PIDs</key>
+            <dict>
+              <key>value</key>
+              <true/>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Penetration:User Thickness</string>
+          <key>executionMode</key>
+          <int>4</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>User Thickness</key>
+            <dict>
+              <key>value</key>
+              <real>0.65000000</real>
+            </dict>
+            <key>Allow planar self proximities</key>
+            <dict>
+              <key>value</key>
+              <false/>
+            </dict>
+            <key>Check same PIDs</key>
+            <dict>
+              <key>value</key>
+              <true/>
+            </dict>
+            <key>Round shell edges</key>
+            <dict>
+              <key>value</key>
+              <true/>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Penetration:Property Thickness</string>
+          <key>executionMode</key>
+          <int>4</int>
+          <key>active</key>
+          <int>0</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>Factor</key>
+            <dict>
+              <key>value</key>
+              <real>1.00000000</real>
+            </dict>
+            <key>Check same PIDs</key>
+            <dict>
+              <key>value</key>
+              <true/>
+            </dict>
+            <key>Allow planar self proximities</key>
+            <dict>
+              <key>value</key>
+              <false/>
+            </dict>
+            <key>Round shell edges</key>
+            <dict>
+              <key>value</key>
+              <true/>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Undefined Properties</string>
+          <key>executionMode</key>
+          <int>4</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict/>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Dependency Abaqus</string>
+          <key>executionMode</key>
+          <int>4</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict/>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Contacts</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>0</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>Detect Intersections Only</key>
+            <dict>
+              <key>value</key>
+              <false/>
+            </dict>
+            <key>Minimum penetration depth</key>
+            <dict>
+              <key>value</key>
+              <real>1073741824.00000000</real>
+            </dict>
+            <key>Selected Contacts</key>
+            <dict>
+              <key>value</key>
+              <string/>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Loop Abaqus</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict/>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Multiple BCs</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict/>
+        </dict>
+      </array>
+      <key>info</key>
+      <string/>
+      <key>errors</key>
+      <array/>
+    </dict>
+    <key>SKODA_PAMCRASH_SK316/5/6</key>
+    <dict>
+      <key>checks</key>
+      <array>
+        <dict>
+          <key>name</key>
+          <string>Check TIEDs for SKODA (PAM)</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>Include prefix</key>
+            <dict>
+              <key>value</key>
+              <string>FEN</string>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Check materials with a checking list (ABA/PAM/NAS) - SKODA: 23C</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>Number of segments</key>
+            <dict>
+              <key>value</key>
+              <string>5</string>
+            </dict>
+            <key>Segment of material name</key>
+            <dict>
+              <key>value</key>
+              <string>5</string>
+            </dict>
+            <key>Type of loadcase</key>
+            <dict>
+              <key>value</key>
+              <string>SK3165_+23</string>
+            </dict>
+            <key>Solver</key>
+            <dict>
+              <key>value</key>
+              <string>PAMCRASH</string>
+            </dict>
+            <key>Matching list</key>
+            <dict>
+              <key>value</key>
+              <string>/data/fem/+software/SKODA_INCLUDE/white_list_bumpers_SK316</string>
+            </dict>
+            <key>Delimiter for part name</key>
+            <dict>
+              <key>value</key>
+              <string>__</string>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Check parts for SKODA/NISSAN (ABA/PAM)</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>Number of segments</key>
+            <dict>
+              <key>value</key>
+              <string>5</string>
+            </dict>
+            <key>Segment of thickness name</key>
+            <dict>
+              <key>value</key>
+              <string>2</string>
+            </dict>
+            <key>Number of digits for thickness</key>
+            <dict>
+              <key>value</key>
+              <string>1</string>
+            </dict>
+            <key>Max. number of chars</key>
+            <dict>
+              <key>value</key>
+              <string>80</string>
+            </dict>
+            <key>Contact thickness check</key>
+            <dict>
+              <key>value</key>
+              <string>YES</string>
+            </dict>
+            <key>Thickness by part name check</key>
+            <dict>
+              <key>value</key>
+              <string>YES</string>
+            </dict>
+            <key>Solver</key>
+            <dict>
+              <key>value</key>
+              <string>PAMCRASH</string>
+            </dict>
+            <key>Delimiter for part name</key>
+            <dict>
+              <key>value</key>
+              <string>__</string>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Check quality of elements for SKODA (ABA/PAM)</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>THICKNESS FACTOR</key>
+            <dict>
+              <key>value</key>
+              <string>1.1</string>
+            </dict>
+            <key>SKEW,TRIA</key>
+            <dict>
+              <key>value</key>
+              <string>60.0</string>
+            </dict>
+            <key>SKEW,QUAD</key>
+            <dict>
+              <key>value</key>
+              <string>48.0</string>
+            </dict>
+            <key>Detail list for number of errors</key>
+            <dict>
+              <key>value</key>
+              <string>100</string>
+            </dict>
+            <key>Quality mesh file</key>
+            <dict>
+              <key>value</key>
+              <string>/data/fem/+software/NAVODKY/Navodky_SKODA/batch_mesh_sessions_quality/plast_5mm/Plast_5mm.ansa_qual</string>
+            </dict>
+            <key>Solver</key>
+            <dict>
+              <key>value</key>
+              <string>PAMCRASH</string>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Check materials with a checking list (ABA/PAM/NAS) - SKODA: 65</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>Number of segments</key>
+            <dict>
+              <key>value</key>
+              <string>5</string>
+            </dict>
+            <key>Segment of material name</key>
+            <dict>
+              <key>value</key>
+              <string>5</string>
+            </dict>
+            <key>Type of loadcase</key>
+            <dict>
+              <key>value</key>
+              <string>SK3165_+65</string>
+            </dict>
+            <key>Solver</key>
+            <dict>
+              <key>value</key>
+              <string>PAMCRASH</string>
+            </dict>
+            <key>Matching list</key>
+            <dict>
+              <key>value</key>
+              <string>/data/fem/+software/SKODA_INCLUDE/white_list_bumpers_SK316</string>
+            </dict>
+            <key>Delimiter for part name</key>
+            <dict>
+              <key>value</key>
+              <string>__</string>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Check materials with a checking list (ABA/PAM/NAS) - SKODA: -10</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>Number of segments</key>
+            <dict>
+              <key>value</key>
+              <string>5</string>
+            </dict>
+            <key>Segment of material name</key>
+            <dict>
+              <key>value</key>
+              <string>5</string>
+            </dict>
+            <key>Type of loadcase</key>
+            <dict>
+              <key>value</key>
+              <string>SK3165_-10</string>
+            </dict>
+            <key>Solver</key>
+            <dict>
+              <key>value</key>
+              <string>PAMCRASH</string>
+            </dict>
+            <key>Matching list</key>
+            <dict>
+              <key>value</key>
+              <string>/data/fem/+software/SKODA_INCLUDE/white_list_bumpers_SK316</string>
+            </dict>
+            <key>Delimiter for part name</key>
+            <dict>
+              <key>value</key>
+              <string>__</string>
+            </dict>
+          </dict>
+        </dict>
+      </array>
+      <key>info</key>
+      <string/>
+      <key>errors</key>
+      <array/>
+    </dict>
+    <key>NISSAN_PAMCRASH</key>
+    <dict>
+      <key>checks</key>
+      <array>
+        <dict>
+          <key>name</key>
+          <string>Check materials with a checking list (ABA/PAM/NAS) - NISSAN</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>Number of segments</key>
+            <dict>
+              <key>value</key>
+              <string>4</string>
+            </dict>
+            <key>Segment of material name</key>
+            <dict>
+              <key>value</key>
+              <string>2</string>
+            </dict>
+            <key>Type of loadcase</key>
+            <dict>
+              <key>value</key>
+              <string>PV1200</string>
+            </dict>
+            <key>Solver</key>
+            <dict>
+              <key>value</key>
+              <string>PAMCRASH</string>
+            </dict>
+            <key>Matching list</key>
+            <dict>
+              <key>value</key>
+              <string>/data/ostatni/NISSAN/BATTERY_CASE/SCRIPTS/white_list</string>
+            </dict>
+            <key>Delimiter for part name</key>
+            <dict>
+              <key>value</key>
+              <string>__</string>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Check quality of shell elements for NISSAN (PAM)</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>LEN 1 - old </key>
+            <dict>
+              <key>value</key>
+              <string>4.0-4.5,5.5-6:&lt;=5</string>
+            </dict>
+            <key>LEN 2 - old </key>
+            <dict>
+              <key>value</key>
+              <string>4.5-4.8,5.2-5.5:&lt;=20</string>
+            </dict>
+            <key>LEN 3 - old </key>
+            <dict>
+              <key>value</key>
+              <string>4.8-5.2:&gt;=75</string>
+            </dict>
+            <key>LEN 4 - old </key>
+            <dict>
+              <key>value</key>
+              <string>0-0.1,5.5-100:==0</string>
+            </dict>
+            <key>LEN 5 - old </key>
+            <dict>
+              <key>value</key>
+              <string>0-4.5,100-101:==0</string>
+            </dict>
+            <key>LEN 10 - new </key>
+            <dict>
+              <key>value</key>
+              <string>4.8-5.2:&gt;=60</string>
+            </dict>
+            <key>LEN 11 - new </key>
+            <dict>
+              <key>value</key>
+              <string>4.5-4.8,5.2-5.5:&lt;=30</string>
+            </dict>
+            <key>LEN 12 - new </key>
+            <dict>
+              <key>value</key>
+              <string>4.0-4.5,5.5-6:&lt;=10</string>
+            </dict>
+            <key>LEN 13 - new - glue</key>
+            <dict>
+              <key>value</key>
+              <string>4.5-5.5:&gt;=70</string>
+            </dict>
+            <key>LEN 14 - new - glue</key>
+            <dict>
+              <key>value</key>
+              <string>3.5-4.5,5.5-6:&lt;=30</string>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Check parts for NISSAN (ABA/PAM)</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>Number of segments</key>
+            <dict>
+              <key>value</key>
+              <string>4</string>
+            </dict>
+            <key>Segment of thickness name</key>
+            <dict>
+              <key>value</key>
+              <string>3</string>
+            </dict>
+            <key>Number of digits for thickness</key>
+            <dict>
+              <key>value</key>
+              <string>1</string>
+            </dict>
+            <key>Max. number of chars</key>
+            <dict>
+              <key>value</key>
+              <string>80</string>
+            </dict>
+            <key>Contact thickness check</key>
+            <dict>
+              <key>value</key>
+              <string>NO</string>
+            </dict>
+            <key>Thickness by part name check</key>
+            <dict>
+              <key>value</key>
+              <string>YES</string>
+            </dict>
+            <key>Solver</key>
+            <dict>
+              <key>value</key>
+              <string>PAMCRASH</string>
+            </dict>
+            <key>Delimiter for part name</key>
+            <dict>
+              <key>value</key>
+              <string>__</string>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Check quality of elements for SKODA (ABA/PAM)</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>THICKNESS FACTOR</key>
+            <dict>
+              <key>value</key>
+              <string>1.1</string>
+            </dict>
+            <key>SKEW,TRIA</key>
+            <dict>
+              <key>value</key>
+              <string>60.0</string>
+            </dict>
+            <key>SKEW,QUAD</key>
+            <dict>
+              <key>value</key>
+              <string>48.0</string>
+            </dict>
+            <key>Detail list for number of errors</key>
+            <dict>
+              <key>value</key>
+              <string>100</string>
+            </dict>
+            <key>Quality mesh file</key>
+            <dict>
+              <key>value</key>
+              <string>/data/fem/+software/NAVODKY/Navodky_SKODA/batch_mesh_sessions_quality/plast_5mm/Plast_5mm.ansa_qual</string>
+            </dict>
+            <key>Solver</key>
+            <dict>
+              <key>value</key>
+              <string>PAMCRASH</string>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Check parts by xlsx file (PAM)</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>Segment of part name</key>
+            <dict>
+              <key>value</key>
+              <string>1</string>
+            </dict>
+            <key>Segment of material name</key>
+            <dict>
+              <key>value</key>
+              <string>2</string>
+            </dict>
+            <key>Segment of thickness name</key>
+            <dict>
+              <key>value</key>
+              <string>3</string>
+            </dict>
+            <key>Number of segments</key>
+            <dict>
+              <key>value</key>
+              <string>4</string>
+            </dict>
+            <key>Thickness by part name check</key>
+            <dict>
+              <key>value</key>
+              <string>YES</string>
+            </dict>
+            <key>Material by part name check</key>
+            <dict>
+              <key>value</key>
+              <string>YES</string>
+            </dict>
+            <key>Excel sheet name</key>
+            <dict>
+              <key>value</key>
+              <string>BCC18FU_Var_B_Cost</string>
+            </dict>
+            <key>Excel part name identifier</key>
+            <dict>
+              <key>value</key>
+              <string>Component</string>
+            </dict>
+            <key>Excel part number name identifier</key>
+            <dict>
+              <key>value</key>
+              <string>P/N</string>
+            </dict>
+            <key>Excel material name identifier</key>
+            <dict>
+              <key>value</key>
+              <string>Material</string>
+            </dict>
+            <key>Excel thickness name identifier</key>
+            <dict>
+              <key>value</key>
+              <string>t [mm]</string>
+            </dict>
+            <key>Solver</key>
+            <dict>
+              <key>value</key>
+              <string>PAMCRASH</string>
+            </dict>
+            <key>Delimiter for part name</key>
+            <dict>
+              <key>value</key>
+              <string>__</string>
+            </dict>
+          </dict>
+        </dict>
+      </array>
+      <key>info</key>
+      <string/>
+      <key>errors</key>
+      <array/>
+    </dict>
+    <key>SKODA_PAMCRASH</key>
+    <dict>
+      <key>checks</key>
+      <array>
+        <dict>
+          <key>name</key>
+          <string>Check TIEDs for SKODA (PAM)</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>Include prefix</key>
+            <dict>
+              <key>value</key>
+              <string>RBU</string>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Penetration:Property Thickness</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>Factor</key>
+            <dict>
+              <key>value</key>
+              <real>1.00000000</real>
+            </dict>
+            <key>Check same PIDs</key>
+            <dict>
+              <key>value</key>
+              <true/>
+            </dict>
+            <key>Allow planar self proximities</key>
+            <dict>
+              <key>value</key>
+              <false/>
+            </dict>
+            <key>Round shell edges</key>
+            <dict>
+              <key>value</key>
+              <true/>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Check parts for SKODA/NISSAN (ABA/PAM)</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>Number of segments</key>
+            <dict>
+              <key>value</key>
+              <string>5</string>
+            </dict>
+            <key>Segment of thickness name</key>
+            <dict>
+              <key>value</key>
+              <string>2</string>
+            </dict>
+            <key>Number of digits for thickness</key>
+            <dict>
+              <key>value</key>
+              <string>1</string>
+            </dict>
+            <key>Max. number of chars</key>
+            <dict>
+              <key>value</key>
+              <string>80</string>
+            </dict>
+            <key>Contact thickness check</key>
+            <dict>
+              <key>value</key>
+              <string>YES</string>
+            </dict>
+            <key>Thickness by part name check</key>
+            <dict>
+              <key>value</key>
+              <string>YES</string>
+            </dict>
+            <key>Solver</key>
+            <dict>
+              <key>value</key>
+              <string>PAMCRASH</string>
+            </dict>
+            <key>Delimiter for part name</key>
+            <dict>
+              <key>value</key>
+              <string>__</string>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Check quality of elements for SKODA (ABA/PAM)</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>THICKNESS FACTOR</key>
+            <dict>
+              <key>value</key>
+              <string>1.1</string>
+            </dict>
+            <key>SKEW,TRIA</key>
+            <dict>
+              <key>value</key>
+              <string>60.0</string>
+            </dict>
+            <key>SKEW,QUAD</key>
+            <dict>
+              <key>value</key>
+              <string>48.0</string>
+            </dict>
+            <key>Detail list for number of errors</key>
+            <dict>
+              <key>value</key>
+              <string>100</string>
+            </dict>
+            <key>Quality mesh file</key>
+            <dict>
+              <key>value</key>
+              <string>/data/fem/+software/NAVODKY/Navodky_SKODA/batch_mesh_sessions_quality/plast_5mm/Plast_5mm.ansa_qual</string>
+            </dict>
+            <key>Solver</key>
+            <dict>
+              <key>value</key>
+              <string>PAMCRASH</string>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Check materials with a checking list (ABA/PAM/NAS)</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>Number of segments</key>
+            <dict>
+              <key>value</key>
+              <string>5</string>
+            </dict>
+            <key>Segment of material name</key>
+            <dict>
+              <key>value</key>
+              <string>5</string>
+            </dict>
+            <key>Type of loadcase</key>
+            <dict>
+              <key>value</key>
+              <string>MAP_KEY</string>
+            </dict>
+            <key>Solver</key>
+            <dict>
+              <key>value</key>
+              <string>PAMCRASH</string>
+            </dict>
+            <key>Matching list</key>
+            <dict>
+              <key>value</key>
+              <string>/data/fem/+software/SKODA_INCLUDE/white_list</string>
+            </dict>
+            <key>Delimiter for part name</key>
+            <dict>
+              <key>value</key>
+              <string>__</string>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Check quality of elements (ABA/PAM/LSDYNA)</string>
+          <key>executionMode</key>
+          <int>4</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>Car - SKODA/DAIMLER</key>
+            <dict>
+              <key>value</key>
+              <string>SKODA</string>
+            </dict>
+            <key>Detail list for number of errors</key>
+            <dict>
+              <key>value</key>
+              <string>100</string>
+            </dict>
+            <key>User quality mesh file</key>
+            <dict>
+              <key>value</key>
+              <string/>
+            </dict>
+            <key>Solver</key>
+            <dict>
+              <key>value</key>
+              <string>PAMCRASH</string>
+            </dict>
+            <key>Material type (polymer/steel)</key>
+            <dict>
+              <key>value</key>
+              <string>polymer</string>
+            </dict>
+            <key>Default mesh length</key>
+            <dict>
+              <key>value</key>
+              <string>5</string>
+            </dict>
+          </dict>
+        </dict>
+      </array>
+      <key>info</key>
+      <string/>
+      <key>errors</key>
+      <array/>
+    </dict>
+    <key>COMMON_IDIADA_user_checks</key>
+    <dict>
+      <key>checks</key>
+      <array>
+        <dict>
+          <key>name</key>
+          <string>Check TIEDs for SKODA (PAM)</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>Include prefix</key>
+            <dict>
+              <key>value</key>
+              <string>FEN</string>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Check TIEDs for NISSAN (PAM)</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Check materials with a checking list (ABA/PAM/NAS) - SKODA: 23C</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>Number of segments</key>
+            <dict>
+              <key>value</key>
+              <string>5</string>
+            </dict>
+            <key>Segment of material name</key>
+            <dict>
+              <key>value</key>
+              <string>5</string>
+            </dict>
+            <key>Type of loadcase</key>
+            <dict>
+              <key>value</key>
+              <string>SK3165_+23</string>
+            </dict>
+            <key>Solver</key>
+            <dict>
+              <key>value</key>
+              <string>PAMCRASH</string>
+            </dict>
+            <key>Matching list</key>
+            <dict>
+              <key>value</key>
+              <string>/data/fem/+software/SKODA_INCLUDE/white_list_bumpers_SK316</string>
+            </dict>
+            <key>Delimiter for part name</key>
+            <dict>
+              <key>value</key>
+              <string>__</string>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Check parts for SKODA/NISSAN (ABA/PAM)</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>Number of segments</key>
+            <dict>
+              <key>value</key>
+              <string>5</string>
+            </dict>
+            <key>Segment of thickness name</key>
+            <dict>
+              <key>value</key>
+              <string>2</string>
+            </dict>
+            <key>Number of digits for thickness</key>
+            <dict>
+              <key>value</key>
+              <string>1</string>
+            </dict>
+            <key>Max. number of chars</key>
+            <dict>
+              <key>value</key>
+              <string>80</string>
+            </dict>
+            <key>Contact thickness check</key>
+            <dict>
+              <key>value</key>
+              <string>YES</string>
+            </dict>
+            <key>Thickness by part name check</key>
+            <dict>
+              <key>value</key>
+              <string>YES</string>
+            </dict>
+            <key>Solver</key>
+            <dict>
+              <key>value</key>
+              <string>PAMCRASH</string>
+            </dict>
+            <key>Delimiter for part name</key>
+            <dict>
+              <key>value</key>
+              <string>__</string>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Check RBODY elements for NISSAN (PAM)</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Check materials with a checking list (ABA/PAM/NAS) - NISSAN</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>Number of segments</key>
+            <dict>
+              <key>value</key>
+              <string>4</string>
+            </dict>
+            <key>Segment of material name</key>
+            <dict>
+              <key>value</key>
+              <string>2</string>
+            </dict>
+            <key>Type of loadcase</key>
+            <dict>
+              <key>value</key>
+              <string>PV1200</string>
+            </dict>
+            <key>Solver</key>
+            <dict>
+              <key>value</key>
+              <string>PAMCRASH</string>
+            </dict>
+            <key>Matching list</key>
+            <dict>
+              <key>value</key>
+              <string>/data/ostatni/NISSAN/BATTERY_CASE/SCRIPTS/white_list</string>
+            </dict>
+            <key>Delimiter for part name</key>
+            <dict>
+              <key>value</key>
+              <string>__</string>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Check quality of shell elements for NISSAN (PAM)</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>LEN 1 - old </key>
+            <dict>
+              <key>value</key>
+              <string>4.0-4.5,5.5-6:&lt;=5</string>
+            </dict>
+            <key>LEN 2 - old </key>
+            <dict>
+              <key>value</key>
+              <string>4.5-4.8,5.2-5.5:&lt;=20</string>
+            </dict>
+            <key>LEN 3 - old </key>
+            <dict>
+              <key>value</key>
+              <string>4.8-5.2:&gt;=75</string>
+            </dict>
+            <key>LEN 4 - old </key>
+            <dict>
+              <key>value</key>
+              <string>0-0.1,5.5-100:==0</string>
+            </dict>
+            <key>LEN 5 - old </key>
+            <dict>
+              <key>value</key>
+              <string>0-4.5,100-101:==0</string>
+            </dict>
+            <key>LEN 10 - new </key>
+            <dict>
+              <key>value</key>
+              <string>4.8-5.2:&gt;=60</string>
+            </dict>
+            <key>LEN 11 - new </key>
+            <dict>
+              <key>value</key>
+              <string>4.5-4.8,5.2-5.5:&lt;=30</string>
+            </dict>
+            <key>LEN 12 - new </key>
+            <dict>
+              <key>value</key>
+              <string>4.0-4.5,5.5-6:&lt;=10</string>
+            </dict>
+            <key>LEN 13 - new - glue</key>
+            <dict>
+              <key>value</key>
+              <string>4.5-5.5:&gt;=70</string>
+            </dict>
+            <key>LEN 14 - new - glue</key>
+            <dict>
+              <key>value</key>
+              <string>3.5-4.5,5.5-6:&lt;=30</string>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Check parts for NISSAN (ABA/PAM)</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>Number of segments</key>
+            <dict>
+              <key>value</key>
+              <string>4</string>
+            </dict>
+            <key>Segment of thickness name</key>
+            <dict>
+              <key>value</key>
+              <string>3</string>
+            </dict>
+            <key>Number of digits for thickness</key>
+            <dict>
+              <key>value</key>
+              <string>1</string>
+            </dict>
+            <key>Max. number of chars</key>
+            <dict>
+              <key>value</key>
+              <string>80</string>
+            </dict>
+            <key>Contact thickness check</key>
+            <dict>
+              <key>value</key>
+              <string>NO</string>
+            </dict>
+            <key>Thickness by part name check</key>
+            <dict>
+              <key>value</key>
+              <string>YES</string>
+            </dict>
+            <key>Solver</key>
+            <dict>
+              <key>value</key>
+              <string>PAMCRASH</string>
+            </dict>
+            <key>Delimiter for part name</key>
+            <dict>
+              <key>value</key>
+              <string>__</string>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Check quality of elements for SKODA (ABA/PAM)</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>THICKNESS FACTOR</key>
+            <dict>
+              <key>value</key>
+              <string>1.1</string>
+            </dict>
+            <key>SKEW,TRIA</key>
+            <dict>
+              <key>value</key>
+              <string>60.0</string>
+            </dict>
+            <key>SKEW,QUAD</key>
+            <dict>
+              <key>value</key>
+              <string>48.0</string>
+            </dict>
+            <key>Detail list for number of errors</key>
+            <dict>
+              <key>value</key>
+              <string>100</string>
+            </dict>
+            <key>Quality mesh file</key>
+            <dict>
+              <key>value</key>
+              <string>/data/fem/+software/NAVODKY/Navodky_SKODA/batch_mesh_sessions_quality/plast_5mm/Plast_5mm.ansa_qual</string>
+            </dict>
+            <key>Solver</key>
+            <dict>
+              <key>value</key>
+              <string>PAMCRASH</string>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Check materials with a checking list (ABA/PAM/NAS) - SKODA: 65</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>Number of segments</key>
+            <dict>
+              <key>value</key>
+              <string>5</string>
+            </dict>
+            <key>Segment of material name</key>
+            <dict>
+              <key>value</key>
+              <string>5</string>
+            </dict>
+            <key>Type of loadcase</key>
+            <dict>
+              <key>value</key>
+              <string>SK3165_+65</string>
+            </dict>
+            <key>Solver</key>
+            <dict>
+              <key>value</key>
+              <string>PAMCRASH</string>
+            </dict>
+            <key>Matching list</key>
+            <dict>
+              <key>value</key>
+              <string>/data/fem/+software/SKODA_INCLUDE/white_list_bumpers_SK316</string>
+            </dict>
+            <key>Delimiter for part name</key>
+            <dict>
+              <key>value</key>
+              <string>__</string>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Check materials with a checking list (ABA/PAM/NAS)</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>Number of segments</key>
+            <dict>
+              <key>value</key>
+              <string>5</string>
+            </dict>
+            <key>Segment of material name</key>
+            <dict>
+              <key>value</key>
+              <string>5</string>
+            </dict>
+            <key>Type of loadcase</key>
+            <dict>
+              <key>value</key>
+              <string>MAP_KEY</string>
+            </dict>
+            <key>Solver</key>
+            <dict>
+              <key>value</key>
+              <string>PAMCRASH</string>
+            </dict>
+            <key>Matching list</key>
+            <dict>
+              <key>value</key>
+              <string>/data/fem/+software/SKODA_INCLUDE/white_list</string>
+            </dict>
+            <key>Delimiter for part name</key>
+            <dict>
+              <key>value</key>
+              <string>__</string>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Check parts by xlsx file (PAM)</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>Segment of part name</key>
+            <dict>
+              <key>value</key>
+              <string>1</string>
+            </dict>
+            <key>Segment of material name</key>
+            <dict>
+              <key>value</key>
+              <string>2</string>
+            </dict>
+            <key>Segment of thickness name</key>
+            <dict>
+              <key>value</key>
+              <string>3</string>
+            </dict>
+            <key>Number of segments</key>
+            <dict>
+              <key>value</key>
+              <string>4</string>
+            </dict>
+            <key>Thickness by part name check</key>
+            <dict>
+              <key>value</key>
+              <string>YES</string>
+            </dict>
+            <key>Material by part name check</key>
+            <dict>
+              <key>value</key>
+              <string>YES</string>
+            </dict>
+            <key>Excel sheet name</key>
+            <dict>
+              <key>value</key>
+              <string>BCC18FU_Var_B_Cost</string>
+            </dict>
+            <key>Excel part name identifier</key>
+            <dict>
+              <key>value</key>
+              <string>Component</string>
+            </dict>
+            <key>Excel part number name identifier</key>
+            <dict>
+              <key>value</key>
+              <string>P/N</string>
+            </dict>
+            <key>Excel material name identifier</key>
+            <dict>
+              <key>value</key>
+              <string>Material</string>
+            </dict>
+            <key>Excel thickness name identifier</key>
+            <dict>
+              <key>value</key>
+              <string>t [mm]</string>
+            </dict>
+            <key>Solver</key>
+            <dict>
+              <key>value</key>
+              <string>PAMCRASH</string>
+            </dict>
+            <key>Delimiter for part name</key>
+            <dict>
+              <key>value</key>
+              <string>__</string>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Check materials with a checking list (ABA/PAM/NAS) - SKODA: -10</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>Number of segments</key>
+            <dict>
+              <key>value</key>
+              <string>5</string>
+            </dict>
+            <key>Segment of material name</key>
+            <dict>
+              <key>value</key>
+              <string>5</string>
+            </dict>
+            <key>Type of loadcase</key>
+            <dict>
+              <key>value</key>
+              <string>SK3165_-10</string>
+            </dict>
+            <key>Solver</key>
+            <dict>
+              <key>value</key>
+              <string>PAMCRASH</string>
+            </dict>
+            <key>Matching list</key>
+            <dict>
+              <key>value</key>
+              <string>/data/fem/+software/SKODA_INCLUDE/white_list_bumpers_SK316</string>
+            </dict>
+            <key>Delimiter for part name</key>
+            <dict>
+              <key>value</key>
+              <string>__</string>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Check SHELL section (ABA)</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>optional1</key>
+            <dict>
+              <key>value</key>
+              <string>R</string>
+            </dict>
+            <key>type_check</key>
+            <dict>
+              <key>value</key>
+              <string>SHELL_SECTION</string>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Check CONTACTs (ABA)</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>type_check</key>
+            <dict>
+              <key>value</key>
+              <string>CONTACT_PAIR</string>
+            </dict>
+            <key>INTERACTION</key>
+            <dict>
+              <key>value</key>
+              <string>&gt;=1.0</string>
+            </dict>
+            <key>ADJUST</key>
+            <dict>
+              <key>value</key>
+              <string>POS_VAL</string>
+            </dict>
+            <key>POS_VAL</key>
+            <dict>
+              <key>value</key>
+              <string>&gt;=0.0</string>
+            </dict>
+            <key>IF-NOT-CHECK VALUE</key>
+            <dict>
+              <key>value</key>
+              <string>&gt;=0.0</string>
+            </dict>
+            <key>IF-CHECK TYPE</key>
+            <dict>
+              <key>value</key>
+              <string>CONTACT PAIR</string>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Check BEAM section elements (ABA)</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>optional2</key>
+            <dict>
+              <key>value</key>
+              <string>H</string>
+            </dict>
+            <key>type_check</key>
+            <dict>
+              <key>value</key>
+              <string>BEAM_SECTION</string>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Check GAP penetrations (ABA)</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Check TIEDs (ABA)</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>type_check</key>
+            <dict>
+              <key>value</key>
+              <string>TIE</string>
+            </dict>
+            <key>PARAM</key>
+            <dict>
+              <key>value</key>
+              <string>POS_TOLER</string>
+            </dict>
+            <key>DISTANCE</key>
+            <dict>
+              <key>value</key>
+              <string>==5</string>
+            </dict>
+            <key>TYPE_tie_coefficients</key>
+            <dict>
+              <key>value</key>
+              <string>SURFACE TO SURFACE</string>
+            </dict>
+            <key>ADJUST</key>
+            <dict>
+              <key>value</key>
+              <string>NO</string>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Check CONNECTOR section elements (ABA)</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>type_check</key>
+            <dict>
+              <key>value</key>
+              <string>CONNECTOR</string>
+            </dict>
+          </dict>
+        </dict>
+      </array>
+      <key>info</key>
+      <string/>
+      <key>errors</key>
+      <array/>
+    </dict>
+    <key>COMMON_ABAQUS_PV1200/RKD</key>
+    <dict>
+      <key>checks</key>
+      <array>
+        <dict>
+          <key>name</key>
+          <string>Duplicate</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>Separate by</key>
+            <dict>
+              <key>value</key>
+              <int>0</int>
+            </dict>
+            <key>Report material null elements</key>
+            <dict>
+              <key>value</key>
+              <false/>
+            </dict>
+            <key>Report semi-duplicate solids</key>
+            <dict>
+              <key>value</key>
+              <false/>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Free</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>Consider nodes with mass as free nodes</key>
+            <dict>
+              <key>value</key>
+              <true/>
+            </dict>
+            <key>Do not report free nodes attached to non-visible entities</key>
+            <dict>
+              <key>value</key>
+              <true/>
+            </dict>
+            <key>Consider auxiliary nodes as free nodes</key>
+            <dict>
+              <key>value</key>
+              <true/>
+            </dict>
+            <key>Do not report master nodes of rigid bodies</key>
+            <dict>
+              <key>value</key>
+              <true/>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Length</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>Lower Limit</key>
+            <dict>
+              <key>value</key>
+              <real>0.00000000</real>
+            </dict>
+            <key>Upper Limit</key>
+            <dict>
+              <key>value</key>
+              <real>0.10000000</real>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Loop Abaqus</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict/>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Undefined</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict/>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Undefined Materials</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict/>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Undefined Properties</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict/>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Check materials with a checking list (ABA/PAM/NAS)</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>Number of segments</key>
+            <dict>
+              <key>value</key>
+              <string>5</string>
+            </dict>
+            <key>Segment of material name</key>
+            <dict>
+              <key>value</key>
+              <string>5</string>
+            </dict>
+            <key>Type of loadcase</key>
+            <dict>
+              <key>value</key>
+              <string>MAP_KEY</string>
+            </dict>
+            <key>Solver</key>
+            <dict>
+              <key>value</key>
+              <string>PAMCRASH</string>
+            </dict>
+            <key>Matching list</key>
+            <dict>
+              <key>value</key>
+              <string>/data/fem/+software/SKODA_INCLUDE/white_list</string>
+            </dict>
+            <key>Delimiter for part name</key>
+            <dict>
+              <key>value</key>
+              <string>__</string>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Check SHELL section (ABA)</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>optional1</key>
+            <dict>
+              <key>value</key>
+              <string>R</string>
+            </dict>
+            <key>type_check</key>
+            <dict>
+              <key>value</key>
+              <string>SHELL_SECTION</string>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Check CONTACTs (ABA)</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>type_check</key>
+            <dict>
+              <key>value</key>
+              <string>CONTACT_PAIR</string>
+            </dict>
+            <key>INTERACTION</key>
+            <dict>
+              <key>value</key>
+              <string>&gt;=1.0</string>
+            </dict>
+            <key>ADJUST</key>
+            <dict>
+              <key>value</key>
+              <string>POS_VAL</string>
+            </dict>
+            <key>POS_VAL</key>
+            <dict>
+              <key>value</key>
+              <string>&gt;=0.0</string>
+            </dict>
+            <key>IF-NOT-CHECK VALUE</key>
+            <dict>
+              <key>value</key>
+              <string>&gt;=0.0</string>
+            </dict>
+            <key>IF-CHECK TYPE</key>
+            <dict>
+              <key>value</key>
+              <string>CONTACT PAIR</string>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Check BEAM section elements (ABA)</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>optional2</key>
+            <dict>
+              <key>value</key>
+              <string>H</string>
+            </dict>
+            <key>type_check</key>
+            <dict>
+              <key>value</key>
+              <string>BEAM_SECTION</string>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Check GAP penetrations (ABA)</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Check TIEDs (ABA)</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>type_check</key>
+            <dict>
+              <key>value</key>
+              <string>TIE</string>
+            </dict>
+            <key>PARAM</key>
+            <dict>
+              <key>value</key>
+              <string>POS_TOLER</string>
+            </dict>
+            <key>DISTANCE</key>
+            <dict>
+              <key>value</key>
+              <string>==5</string>
+            </dict>
+            <key>TYPE_tie_coefficients</key>
+            <dict>
+              <key>value</key>
+              <string>SURFACE TO SURFACE</string>
+            </dict>
+            <key>ADJUST</key>
+            <dict>
+              <key>value</key>
+              <string>NO</string>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Check CONNECTOR section elements (ABA)</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>type_check</key>
+            <dict>
+              <key>value</key>
+              <string>CONNECTOR</string>
+            </dict>
+          </dict>
+        </dict>
+      </array>
+      <key>info</key>
+      <string/>
+      <key>errors</key>
+      <array/>
+    </dict>
+    <key>COMMON_NASTRAN</key>
+    <dict>
+      <key>checks</key>
+      <array>
+        <dict>
+          <key>name</key>
+          <string>Free</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>Consider nodes with mass as free nodes</key>
+            <dict>
+              <key>value</key>
+              <true/>
+            </dict>
+            <key>Do not report free nodes attached to non-visible entities</key>
+            <dict>
+              <key>value</key>
+              <true/>
+            </dict>
+            <key>Consider auxiliary nodes as free nodes</key>
+            <dict>
+              <key>value</key>
+              <true/>
+            </dict>
+            <key>Do not report master nodes of rigid bodies</key>
+            <dict>
+              <key>value</key>
+              <true/>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Undefined Materials</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict/>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Undefined Properties</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict/>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>CWelds</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>PROJTOL</key>
+            <dict>
+              <key>value</key>
+              <real>0.02000000</real>
+            </dict>
+            <key>GSPROJ</key>
+            <dict>
+              <key>value</key>
+              <real>20.00000000</real>
+            </dict>
+            <key>DRATIO</key>
+            <dict>
+              <key>value</key>
+              <real>1.00000000</real>
+            </dict>
+            <key>FREEGAGB</key>
+            <dict>
+              <key>value</key>
+              <true/>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>CFasts</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict/>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Dependency Nastran</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict/>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Loop Nastran</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict/>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>RBE3 Definitions</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>Tolerance</key>
+            <dict>
+              <key>value</key>
+              <real>1073741824.00000000</real>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Massless</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>Check for Beam Orientation Nodes</key>
+            <dict>
+              <key>value</key>
+              <true/>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Mesh: Negative Volume</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>Calculation Method</key>
+            <dict>
+              <key>value</key>
+              <int>1</int>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Mesh: Pyramids</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict/>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>PBxSECT</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict/>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Undefined</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict/>
+        </dict>
+      </array>
+      <key>info</key>
+      <string/>
+      <key>errors</key>
+      <array/>
+    </dict>
+    <key>COMMON_LS-DYNA</key>
+    <dict>
+      <key>checks</key>
+      <array>
+        <dict>
+          <key>name</key>
+          <string>Massless</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>0</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>Check for Beam Orientation Nodes</key>
+            <dict>
+              <key>value</key>
+              <false/>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Multiple BCs</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>0</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict/>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Undefined Materials</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>0</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict/>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Undefined Properties</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>0</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict/>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Constraint Rigid Body PIDM - PIDS distance</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>0</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>Distance</key>
+            <dict>
+              <key>value</key>
+              <real>100.00000000</real>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Constraint Rigid Bodies Long Chain</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>0</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>Distance</key>
+            <dict>
+              <key>value</key>
+              <real>100.00000000</real>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Contacts</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>0</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>Detect Intersections Only</key>
+            <dict>
+              <key>value</key>
+              <false/>
+            </dict>
+            <key>Minimum penetration depth</key>
+            <dict>
+              <key>value</key>
+              <real>1073741824.00000000</real>
+            </dict>
+            <key>Selected Contacts</key>
+            <dict>
+              <key>value</key>
+              <string/>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Curves:Axes</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>0</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>Check curves</key>
+            <dict>
+              <key>value</key>
+              <string>none</string>
+              <key>params</key>
+              <dict>
+                <key>of all database</key>
+                <dict>
+                  <key>value</key>
+                  <true/>
+                </dict>
+                <key>used by materials</key>
+                <dict>
+                  <key>value</key>
+                  <false/>
+                </dict>
+              </dict>
+            </dict>
+            <key>Axis to check</key>
+            <dict>
+              <key>value</key>
+              <string>none</string>
+              <key>params</key>
+              <dict>
+                <key>X</key>
+                <dict>
+                  <key>value</key>
+                  <true/>
+                </dict>
+                <key>Y</key>
+                <dict>
+                  <key>value</key>
+                  <true/>
+                </dict>
+              </dict>
+            </dict>
+            <key>Material curves quality criteria</key>
+            <dict>
+              <key>value</key>
+              <string>none</string>
+              <key>params</key>
+              <dict>
+                <key>Max yield stress</key>
+                <dict>
+                  <key>value</key>
+                  <real>2.50000000</real>
+                </dict>
+                <key>Max plastic strain</key>
+                <dict>
+                  <key>value</key>
+                  <real>3.00000000</real>
+                </dict>
+                <key>Max scale factor</key>
+                <dict>
+                  <key>value</key>
+                  <real>2.00000000</real>
+                </dict>
+                <key>Max strain rate</key>
+                <dict>
+                  <key>value</key>
+                  <real>20.00000000</real>
+                </dict>
+              </dict>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Curves:End Time</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>0</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>Solver End Time</key>
+            <dict>
+              <key>value</key>
+              <real>0.00000000</real>
+            </dict>
+            <key>Get End Time from Control</key>
+            <dict>
+              <key>value</key>
+              <true/>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>DB Histories</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>0</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict/>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Mesh: Incomplete</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>0</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict/>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Initial Velocity</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>0</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict/>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Joints</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>0</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict/>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Mass Scale Ratio</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>0</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>From</key>
+            <dict>
+              <key>value</key>
+              <real>1.50000000</real>
+            </dict>
+            <key>To</key>
+            <dict>
+              <key>value</key>
+              <real>1073741824.00000000</real>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Rigid Dependency LS-Dyna</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>0</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict/>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>SPCs on Rigid Body Nodes</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>0</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict/>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Spot Welds</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>0</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>On Same Shell Element</key>
+            <dict>
+              <key>value</key>
+              <true/>
+            </dict>
+            <key>On Neighboring Shells</key>
+            <dict>
+              <key>value</key>
+              <false/>
+            </dict>
+            <key>Angle To Shell's normal</key>
+            <dict>
+              <key>value</key>
+              <true/>
+              <key>params</key>
+              <dict>
+                <key>deg</key>
+                <dict>
+                  <key>value</key>
+                  <real>20.00000000</real>
+                </dict>
+              </dict>
+            </dict>
+            <key>Conflict with Rigids</key>
+            <dict>
+              <key>value</key>
+              <true/>
+            </dict>
+            <key>Invalid Spotweld Beams</key>
+            <dict>
+              <key>value</key>
+              <true/>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Tables</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>0</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict/>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Unconnected Regions:Rigids</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>0</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict/>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Check quality of elements (ABA/PAM/LSDYNA)</string>
+          <key>executionMode</key>
+          <int>4</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>Car - SKODA/DAIMLER</key>
+            <dict>
+              <key>value</key>
+              <string>DAIMLER</string>
+            </dict>
+            <key>Detail list for number of errors</key>
+            <dict>
+              <key>value</key>
+              <string>100</string>
+            </dict>
+            <key>User quality mesh file</key>
+            <dict>
+              <key>value</key>
+              <string/>
+            </dict>
+            <key>Solver</key>
+            <dict>
+              <key>value</key>
+              <string>LSDYNA</string>
+            </dict>
+            <key>Material type (polymer/steel)</key>
+            <dict>
+              <key>value</key>
+              <string>polymer</string>
+            </dict>
+            <key>Default mesh length</key>
+            <dict>
+              <key>value</key>
+              <string>5</string>
+            </dict>
+          </dict>
+        </dict>
+      </array>
+      <key>info</key>
+      <string/>
+      <key>errors</key>
+      <array/>
+    </dict>
+    <key>COMMON_PAMCRASH</key>
+    <dict>
+      <key>checks</key>
+      <array>
+        <dict>
+          <key>name</key>
+          <string>Free</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>0</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>Consider nodes with mass as free nodes</key>
+            <dict>
+              <key>value</key>
+              <true/>
+            </dict>
+            <key>Do not report free nodes attached to non-visible entities</key>
+            <dict>
+              <key>value</key>
+              <true/>
+            </dict>
+            <key>Consider auxiliary nodes as free nodes</key>
+            <dict>
+              <key>value</key>
+              <true/>
+            </dict>
+            <key>Do not report master nodes of rigid bodies</key>
+            <dict>
+              <key>value</key>
+              <true/>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Massless</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>0</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>Check for Beam Orientation Nodes</key>
+            <dict>
+              <key>value</key>
+              <true/>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Materials</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>0</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>Compare by</key>
+            <dict>
+              <key>value</key>
+              <string>none</string>
+              <key>params</key>
+              <dict>
+                <key>Ids</key>
+                <dict>
+                  <key>value</key>
+                  <true/>
+                </dict>
+                <key>Names</key>
+                <dict>
+                  <key>value</key>
+                  <false/>
+                </dict>
+                <key>Most similar</key>
+                <dict>
+                  <key>value</key>
+                  <false/>
+                  <key>params</key>
+                  <dict>
+                    <key>Ids </key>
+                    <dict>
+                      <key>value</key>
+                      <false/>
+                    </dict>
+                    <key>Names </key>
+                    <dict>
+                      <key>value</key>
+                      <false/>
+                    </dict>
+                  </dict>
+                </dict>
+              </dict>
+            </dict>
+            <key>Float values tolerance (%)</key>
+            <dict>
+              <key>value</key>
+              <real>0.00000000</real>
+            </dict>
+            <key>Case sensitive</key>
+            <dict>
+              <key>value</key>
+              <true/>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Multiple BCs</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>0</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict/>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Range Check</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>0</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict/>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Undefined Materials</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>0</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict/>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Undefined Properties</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>0</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict/>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Contacts</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>0</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>Detect Intersections Only</key>
+            <dict>
+              <key>value</key>
+              <false/>
+            </dict>
+            <key>Minimum penetration depth</key>
+            <dict>
+              <key>value</key>
+              <real>1073741824.00000000</real>
+            </dict>
+            <key>Selected Contacts</key>
+            <dict>
+              <key>value</key>
+              <string/>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Dependency Pamcrash</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>0</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict/>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Funct:Axes</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>0</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>Check curves</key>
+            <dict>
+              <key>value</key>
+              <string>none</string>
+              <key>params</key>
+              <dict>
+                <key>of all database</key>
+                <dict>
+                  <key>value</key>
+                  <true/>
+                </dict>
+                <key>used by materials</key>
+                <dict>
+                  <key>value</key>
+                  <false/>
+                </dict>
+              </dict>
+            </dict>
+            <key>Axis to check</key>
+            <dict>
+              <key>value</key>
+              <string>none</string>
+              <key>params</key>
+              <dict>
+                <key>Y</key>
+                <dict>
+                  <key>value</key>
+                  <true/>
+                </dict>
+                <key>X</key>
+                <dict>
+                  <key>value</key>
+                  <false/>
+                </dict>
+              </dict>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Funct:End Time</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>0</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>Solver End Time</key>
+            <dict>
+              <key>value</key>
+              <real>0.00000000</real>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Mesh: Incomplete</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>0</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict/>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Initial Velocity</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>0</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict/>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Mass Scale Ratio</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>0</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>From</key>
+            <dict>
+              <key>value</key>
+              <real>1.50000000</real>
+            </dict>
+            <key>To</key>
+            <dict>
+              <key>value</key>
+              <real>1073741824.00000000</real>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>PLINKs</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>0</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict/>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Duplicate</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>0</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>Separate by</key>
+            <dict>
+              <key>value</key>
+              <int>0</int>
+            </dict>
+            <key>Report material null elements</key>
+            <dict>
+              <key>value</key>
+              <false/>
+            </dict>
+            <key>Report semi-duplicate solids</key>
+            <dict>
+              <key>value</key>
+              <false/>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Check quality of elements (ABA/PAM/LSDYNA)</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>Car - SKODA/DAIMLER</key>
+            <dict>
+              <key>value</key>
+              <string>SKODA</string>
+            </dict>
+            <key>Detail list for number of errors</key>
+            <dict>
+              <key>value</key>
+              <string>100</string>
+            </dict>
+            <key>User quality mesh file</key>
+            <dict>
+              <key>value</key>
+              <string/>
+            </dict>
+            <key>Solver</key>
+            <dict>
+              <key>value</key>
+              <string>PAMCRASH</string>
+            </dict>
+            <key>Material type (polymer/steel)</key>
+            <dict>
+              <key>value</key>
+              <string>polymer</string>
+            </dict>
+            <key>Default mesh length</key>
+            <dict>
+              <key>value</key>
+              <string>5</string>
+            </dict>
+          </dict>
+        </dict>
+      </array>
+      <key>info</key>
+      <string/>
+      <key>errors</key>
+      <array/>
+    </dict>
+    <key>COMMON_ABAQUS</key>
+    <dict>
+      <key>checks</key>
+      <array>
+        <dict>
+          <key>name</key>
+          <string>Duplicate</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>Separate by</key>
+            <dict>
+              <key>value</key>
+              <int>0</int>
+            </dict>
+            <key>Report material null elements</key>
+            <dict>
+              <key>value</key>
+              <false/>
+            </dict>
+            <key>Report semi-duplicate solids</key>
+            <dict>
+              <key>value</key>
+              <false/>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Geometry: Unmeshed Macros</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict/>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Massless</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>Check for Beam Orientation Nodes</key>
+            <dict>
+              <key>value</key>
+              <false/>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Multiple BCs</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict/>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Mesh: Negative Volume</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>Calculation Method</key>
+            <dict>
+              <key>value</key>
+              <int>1</int>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Penetration:Intersections</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>Check same PIDs</key>
+            <dict>
+              <key>value</key>
+              <true/>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Undefined Materials</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict/>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Undefined Properties</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict/>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Amplitudes:Axes</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>Axis 1</key>
+            <dict>
+              <key>value</key>
+              <true/>
+            </dict>
+            <key>Axis 2</key>
+            <dict>
+              <key>value</key>
+              <true/>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Contact Orientation</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict/>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Contacts</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict>
+            <key>Detect Intersections Only</key>
+            <dict>
+              <key>value</key>
+              <false/>
+            </dict>
+            <key>Minimum penetration depth</key>
+            <dict>
+              <key>value</key>
+              <real>1073741824.00000000</real>
+            </dict>
+            <key>Selected Contacts</key>
+            <dict>
+              <key>value</key>
+              <string/>
+            </dict>
+          </dict>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Closed Tie Loops</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict/>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Dependency Abaqus</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict/>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Mesh: Incomplete</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict/>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Loop Abaqus</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict/>
+        </dict>
+        <dict>
+          <key>name</key>
+          <string>Mesh: Pyramids</string>
+          <key>executionMode</key>
+          <int>1</int>
+          <key>active</key>
+          <int>1</int>
+          <key>param_order</key>
+          <string/>
+          <key>params</key>
+          <dict/>
+        </dict>
+      </array>
+      <key>info</key>
+      <string/>
+      <key>errors</key>
+      <array/>
+    </dict>
+  </dict>
+</plist>

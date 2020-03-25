@@ -373,7 +373,35 @@ Revision history graph::
 #         utils.runSubprocess(os.path.join(self.GENERAL_PRODUCTIVE_VERSION_BIN, 'doc-update'))
         documentation = di.ToolDocumentation()
         documentation.create()
+
+    #---------------------------------------------------------------------------
     
+    def getUntrackedFiles(self):
+    
+        untrackedFiles = list()
+        
+        stdout, stderr = utils.runSubprocess('git status',
+            cwd=os.path.dirname(
+            os.path.dirname(self.parentInstaller.mainModulePath)))
+         
+        untrackedBlock = False
+        for line in stdout.splitlines():
+            parts = line.split()
+            if line.startswith('# Untracked files:'):
+                untrackedBlock = True
+                continue
+            elif not line.startswith('#'):
+                continue
+            # skip empty line
+            if len(parts) <= 1:
+                continue
+            elif line.startswith('#   (use "git add <file>'):
+                continue
+            if untrackedBlock:
+                untrackedFiles.append(line.replace('#','').strip())
+        
+        return untrackedFiles
+                    
     #---------------------------------------------------------------------------
                 
 
@@ -531,10 +559,13 @@ class InstallTypeAnsaCheck(BaseInstallType):
     CHECK_INSTALLER_PATH = INSTALL_PATHS['CHECK_INSTALLER_PATH']#'/data/fem/+software/SKRIPTY/tools/repos/ansaChecksPlistUpdater/bin/main.py'
     CHECK_INSTALLER_CHECK_PATH = INSTALL_PATHS['CHECK_INSTALLER_CHECK_PATH']#'/data/fem/+software/SKRIPTY/tools/repos/ansaChecksPlistUpdater/res/checks'
     PRODUCTIVE_VERSION_HOME = INSTALL_PATHS['PRODUCTIVE_VERSION_HOME']#'/data/fem/+software/SKRIPTY/tools/python/ansaTools/checks/general_check/'
+    REPOS_PATH = INSTALL_PATHS['REPOS_PATH']
     
     #---------------------------------------------------------------------------
     
-    def getProjectNameFromSourceFile(self, fileName):
+    def getProjectNameFromSourceFile(self):
+        
+        fileName = self.parentInstaller.mainModuleItem.sourceMainPath
         
         projectName = os.path.basename(str(fileName))
         projectName = os.path.splitext(projectName)[0]
@@ -613,17 +644,54 @@ class InstallTypeAnsaCheck(BaseInstallType):
     def updateForInstallation(self):
          
         ''' This is a workaround for the proper ANSA check installation
-        based check wrap to the one ansaChecksPlistUpdater tool. '''
+        based on the check wrap to the one ansaChecksPlistUpdater tool. '''
         
+        filesToAdd = self.parentInstaller.procedureItems[VersionItem.NAME].filesToAdd
+        
+        updaterLocationFilesToAdd = list()
+        
+        # append check project source file
+        sourceCheckProjectFilePath = self.parentInstaller.mainModuleItem.sourceMainPath
         dst = os.path.join(self.CHECK_INSTALLER_CHECK_PATH,
-            os.path.basename(self.parentInstaller.mainModuleItem.sourceMainPath)) 
+            os.path.basename(self.parentInstaller.mainModuleItem.sourceMainPath))
         
         if os.path.isfile(dst):
             os.remove(dst)
         
-        shutil.copy(self.parentInstaller.mainModuleItem.sourceMainPath,
-            dst)
+        shutil.copy(sourceCheckProjectFilePath, dst)
+        updaterLocationFilesToAdd.append(dst)
+        
+        # relative paths of file to be added
+        for fileToAdd in filesToAdd:
+            src = os.path.join(os.path.dirname(sourceCheckProjectFilePath), fileToAdd)
+            dst = os.path.join(self.CHECK_INSTALLER_CHECK_PATH, fileToAdd)
+            
+            if os.path.isfile(dst):
+                os.remove(dst)
+            
+            shutil.copy(src, dst)
+            
+            updaterLocationFilesToAdd.append(dst)
+        
+        self.parentInstaller.procedureItems[VersionItem.NAME].filesToAdd = updaterLocationFilesToAdd
+
+    #---------------------------------------------------------------------------
+    
+    def getUntrackedFiles(self):
+    
+        untrackedFiles = list()
+        
+        fileName = self.parentInstaller.mainModuleItem.sourceMainPath
+        
+        for path, dirs, files in os.walk(os.path.dirname(fileName)):
+            for file in files:
+                filePath = os.path.join(path, file)
+                if filePath == fileName:
+                    continue
+                relPath = os.path.relpath(filePath, os.path.dirname(fileName))
+                untrackedFiles.append(relPath)
                 
+        return untrackedFiles
     
 #==============================================================================
 @utils.registerClass
@@ -873,21 +941,7 @@ class VersionItem(BaseInstallerProcedureItem):
         self.tagInfo = dict()
         
         self.tagList, self.tagInfo = self.parentInstaller.projectSourceType.getTagInfo(pyProjectPath)
-        
-#         if self.parentInstaller.fromRemoteInstallation:
-#             revision, modifiedBy, lastModified = utils.getRemoteVersionInfo(pyProjectPath)
-#             self.tagList = [revision]
-#             self.tagInfo[revision] = 'AUTOR: %s\nMODIFIED: %s' % (modifiedBy, lastModified)
-#         else:
-#             stdout, stderr = utils.runSubprocess('git tag -n9', pyProjectPath)
-#             
-#             for line in stdout.splitlines():
-#                 if not line.startswith('V'):
-#                     continue
-#                 parts = line.strip().split()
-#                 self.tagList.append(parts[0])
-#                 self.tagInfo[parts[0]] = ' '.join(parts[1:])
-    
+            
     #---------------------------------------------------------------------------
     
     def getTagCommitMessage(self, tagName):
@@ -896,15 +950,14 @@ class VersionItem(BaseInstallerProcedureItem):
             return self.tagInfo[tagName]
         else:
             return ''
-    
-    
-    #---------------------------------------------------------------------------
-         
-    def updateForInstallation(self):
         
-        # add a file automatically in case of an ANSA check
-        if self.parentInstaller.procedureItems[InstallationSetupItem.NAME].installTypeItem.NAME == BaseInstallType.TYPE_ANSA_CHECK:
-            self.filesToAdd.append(self.parentInstaller.mainModuleItem.sourceMainPath)
+    #---------------------------------------------------------------------------
+#          
+#     def updateForInstallation(self):
+#         
+#         # add a file automatically in case of an ANSA check
+#         if self.parentInstaller.procedureItems[InstallationSetupItem.NAME].installTypeItem.NAME == BaseInstallType.TYPE_ANSA_CHECK:
+#             self.filesToAdd.append(self.parentInstaller.mainModuleItem.sourceMainPath)
     
 #=============================================================================
 

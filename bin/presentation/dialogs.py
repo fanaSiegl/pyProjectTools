@@ -40,30 +40,53 @@ class DocuPreviewDialog(object):
 %s
 
    '''
-        
-        src = os.path.join(utils.PATH_RES, 'doc_preview')
+                
+        srcConf = os.path.join(utils.PATH_RES, 'doc_preview', 'source', 'conf.py')
         dst = os.path.join(utils.getInstallTypePaths()['INSTALLATION_PATHS_BASE']['DOCUMENTATON_PATH_TEMP'], 'sphinx')
         
-        sourceSphinxPath = os.path.join(dst,'source')
+        sourceSphinxPath = os.path.join(dst, 'source')
         
         # initiate
         if os.path.isdir(dst):
             shutil.rmtree(dst)
         
-        shutil.copytree(src, dst)
+        # copy source files
+        try:
+            projectDocSouce = os.path.join(self.parentApplication.installer.pyProjectPath, 'doc', 'sphinx', 'source')
+            shutil.copytree(projectDocSouce, sourceSphinxPath)
+            
+            # delete file which should be updated
+            if os.path.isfile(os.path.join(sourceSphinxPath, 'conf.py')):
+                os.remove(os.path.join(sourceSphinxPath, 'conf.py'))
+#             if os.path.isfile(os.path.join(sourceSphinxPath, 'index.rst')):
+#                 os.remove(os.path.join(sourceSphinxPath, 'index.rst'))
                 
+        except Exception as e:
+            print('Failed to copy documentation source files! (%s)' % str(e))
+        
+#         if not os.path.isfile(os.path.join(sourceSphinxPath, 'conf.py')):
+        shutil.copy(srcConf, os.path.join(sourceSphinxPath, 'conf.py'))
+        
+        if os.path.isfile(os.path.join(sourceSphinxPath, 'index.rst')):
+            fi = open(os.path.join(sourceSphinxPath, 'index.rst'))
+            TEMPLATE = fi.read().replace('.. automodule:: main', '%s') 
+            fi.close()
+            
         fo = open(os.path.join(sourceSphinxPath, 'index.rst'), 'wt')
         fo.write(TEMPLATE % docString)
         fo.close()
-        
-        command = 'sphinx-build -b html -d %s %s %s' % (
-            os.path.join(dst, 'build', 'doctrees'),
-            sourceSphinxPath, os.path.join(dst, 'build', 'html'))
-        utils.runSubprocess(command)
                 
+        # create local documentation using installer environment 
+        envExecutable = utils.getEnvironmentExecutable(utils.PATH_INI)
+        utils.runSubprocess('%s -b html -d %s %s %s' % (
+            os.path.join(os.path.dirname(envExecutable), 'sphinx-build'),
+            os.path.join(dst, 'build', 'doctrees'),
+            sourceSphinxPath, os.path.join(dst, 'build', 'html')))
+                        
         address = os.path.join(dst, 'build', 'html', 'index.html')   
         
-        utils.runSubprocess('firefox %s &' % address)
+        os.system('%s %s &' % (
+            utils.getDocumentationBrowser(), address))
     
 #==============================================================================
 

@@ -375,7 +375,6 @@ Indices and tables
     @classmethod
     def initiateFromGithub(cls):
         
-        
         if os.path.exists(DOCUMENTATON_PATH):
             utils.runSubprocess('git pull origin master', DOCUMENTATON_PATH)
         else:

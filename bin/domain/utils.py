@@ -177,3 +177,14 @@ def getGiuthubSettings():
     return config['GITHUB']
 
 #==============================================================================
+
+def getPathAnsaExecutable():
+     
+    config = configparser.ConfigParser()
+     
+    cfgFileName = os.path.join(PATH_INI, CONFIG_FILE)
+    config.read(cfgFileName)
+ 
+    return config.get('INSTALLATION_PATHS_TYPE_ANSA_CHECK', 'ANSA_EXECUTABLE')
+
+#==============================================================================

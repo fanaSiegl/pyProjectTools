@@ -192,7 +192,7 @@ class ProjectTagComboBox(BaseExtendableComboBox):
             return 'V.0.0.1'
             
         try:
-            lastVersion = sorted(versions)[-1]
+            lastVersion = versions[0]
             parts = lastVersion.split('.')
             parts[-1] = str(int(parts[-1]) + 1) 
             nextVersion = '.'.join(parts) 

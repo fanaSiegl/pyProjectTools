@@ -696,8 +696,11 @@ class DocumentationPageWidget(BaseInstallerPageWidget):
             self.docuGroupCombobox.setEnabled(True)
             self.docuDescription.setEnabled(True)
         
+        # disable options by ansa check 
+        if self.installer.getCurrentInstallType() == bi.BaseInstallType.TYPE_ANSA_CHECK:
+            self._setOptionsEnabled(False)
         # deactivate all in case of remote installation source
-        if self.installer.projectSourceType is bi.LocalReposProjectSourceType:
+        elif self.installer.projectSourceType is bi.LocalReposProjectSourceType:
             self._setOptionsEnabled(True)
         else:
             self._setOptionsEnabled(False)

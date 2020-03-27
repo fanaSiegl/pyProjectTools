@@ -13,6 +13,7 @@ from domain import utils
 from domain import doc_items as di
 
 from interfaces import githubio
+from interfaces import ansaio
 
 #=============================================================================
 
@@ -342,7 +343,6 @@ Revision history graph::
         # copy doc source files
         shutil.copytree(SPHINX_LOCAL_DOC_SOURCE, SPHINX_GLOBAL_DOC_SOURCE)
         
-         
         fo = open(docFileName, 'wt')
         fo.write('.. _%s: ./%s\n\n' % (self.applicationName, SPHINX_INDEX))
         fo.write('`%s`_ - %s\n\n' % (self.applicationName, self.docuDescription))
@@ -556,10 +556,11 @@ class InstallTypeAnsaCheck(BaseInstallType):
 
 #TODO: installation is made from repository - change it to "update_ansa_checks" productive version
     
-    CHECK_INSTALLER_PATH = INSTALL_PATHS['CHECK_INSTALLER_PATH']#'/data/fem/+software/SKRIPTY/tools/repos/ansaChecksPlistUpdater/bin/main.py'
-    CHECK_INSTALLER_CHECK_PATH = INSTALL_PATHS['CHECK_INSTALLER_CHECK_PATH']#'/data/fem/+software/SKRIPTY/tools/repos/ansaChecksPlistUpdater/res/checks'
+    
+    CHECK_INSTALLER_CHECKS_PATH = INSTALL_PATHS['CHECK_INSTALLER_CHECKS_PATH']#'/data/fem/+software/SKRIPTY/tools/repos/ansaChecksPlistUpdater/res/checks'
     PRODUCTIVE_VERSION_HOME = INSTALL_PATHS['PRODUCTIVE_VERSION_HOME']#'/data/fem/+software/SKRIPTY/tools/python/ansaTools/checks/general_check/'
     REPOS_PATH = INSTALL_PATHS['REPOS_PATH']
+    CHECK_INSTALLER_PATH = os.path.join(REPOS_PATH, 'bin', 'main.py')
     
     #---------------------------------------------------------------------------
     
@@ -581,52 +582,56 @@ class InstallTypeAnsaCheck(BaseInstallType):
     #---------------------------------------------------------------------------
     
     def install(self, pyProjectPath, revision, applicationName, docuGroup, docuDescription, docString):
-# TODO: implement ansaChecksPlistUpdater functionality...
-        if self.parentInstaller.fromRemoteInstallation:
-            raise InstallerException('Installation not implemented for remote check source!')
-        
         
         print('Installing: %s' % self.NAME)
                 
+        self.pyProjectPath = pyProjectPath
         self.targetDir = os.path.join(self.getTargetDir(), revision)
         self.revision = revision
         self.docuGroup = docuGroup
         self.docuDescription = docuDescription
-        
+                
         # read original docString from check parent updater
         checksParentUpdater = MainModuleItem()
         checksParentUpdater.load(self.CHECK_INSTALLER_PATH)
         self.docString = checksParentUpdater.docString
         
-        self._createDirs()
-        self._installAsDefault()
         self._createRevisionContents()
+        self._installAsDefault()
         
-        self.targetDir = os.path.dirname(os.path.dirname(self.CHECK_INSTALLER_PATH))
+        # create plist and related documentation source files - prior to generating documentation
+        ansaio.AnsaChecksPlistUpdater.createPlist()
+        
+#         self.targetDir = os.path.dirname(os.path.dirname(self.CHECK_INSTALLER_PATH))
         self._createDocumentation()
         
         self.applicationName = 'checks'
         self._publishDocumentation()
         
-    #---------------------------------------------------------------------------
-    
-    def _createDirs(self):
-        
-        if os.path.isdir(self.targetDir): 
-            raise InstallerException('Current revision exists already.')
-        else:
-            os.makedirs(self.targetDir)
+        self._cleanUp()
             
     #---------------------------------------------------------------------------
-    
+ 
     def _createRevisionContents(self):
+         
+        super(InstallTypeAnsaCheck, self)._createRevisionContents()
+         
+        # simplify structure
+        sourcePath = os.path.join(self.targetDir, 'res', 'checks')
+        for fileName in os.listdir(sourcePath):
+            shutil.move(os.path.join(sourcePath, fileName), self.targetDir)
 
-        print('Creating a revision content in: "%s"' % self.targetDir)
+    #---------------------------------------------------------------------------
+    
+    def _cleanUp(self):
         
-        stdout, _ = utils.runSubprocess('%s -copy %s' % (self.CHECK_INSTALLER_PATH, self.targetDir))
+        print('Cleaning up files')
         
-        print(stdout)
-
+        removeDirs = ['.git', 'bin', 'ini', 'res']
+  
+        for dirName in removeDirs:
+            shutil.rmtree(os.path.join(self.targetDir, dirName))
+           
     #---------------------------------------------------------------------------
     
     def _installAsDefault(self):
@@ -652,7 +657,7 @@ class InstallTypeAnsaCheck(BaseInstallType):
         
         # append check project source file
         sourceCheckProjectFilePath = self.parentInstaller.mainModuleItem.sourceMainPath
-        dst = os.path.join(self.CHECK_INSTALLER_CHECK_PATH,
+        dst = os.path.join(self.REPOS_PATH, 'res', 'checks',
             os.path.basename(self.parentInstaller.mainModuleItem.sourceMainPath))
         
         if os.path.isfile(dst):
@@ -664,17 +669,19 @@ class InstallTypeAnsaCheck(BaseInstallType):
         # relative paths of file to be added
         for fileToAdd in filesToAdd:
             src = os.path.join(os.path.dirname(sourceCheckProjectFilePath), fileToAdd)
-            dst = os.path.join(self.CHECK_INSTALLER_CHECK_PATH, fileToAdd)
+            dst = os.path.join(self.REPOS_PATH, 'res', 'checks', fileToAdd)
             
             if os.path.isfile(dst):
                 os.remove(dst)
             
+            if not os.path.isdir(os.path.dirname(dst)):
+                os.makedirs(os.path.dirname(dst))
             shutil.copy(src, dst)
             
             updaterLocationFilesToAdd.append(dst)
         
         self.parentInstaller.procedureItems[VersionItem.NAME].filesToAdd = updaterLocationFilesToAdd
-
+        
     #---------------------------------------------------------------------------
     
     def getUntrackedFiles(self):
@@ -1345,7 +1352,23 @@ class BaseProjectSourceType(object):
             tagList.append(parts[0])
             tagInfo[parts[0]] = ' '.join(parts[1:])
         
-        return tagList, tagInfo
+        def sortTags(tagName):
+            
+            if tagName.startswith('V'):
+                try:
+                    revLevels = tagName[2:].split('.')
+                    value = 0
+                    for level, revNo in enumerate(revLevels[::-1]):
+                        value += int(revNo) * 10**(2*level)
+                    
+                    return value
+                except Exception as e:
+                    print(e)
+                    return tagName
+            else:
+                return tagName
+                
+        return sorted(tagList, key=sortTags), tagInfo
     
     #---------------------------------------------------------------------------
     @classmethod
@@ -1408,7 +1431,7 @@ class MasterReposProjectSourceType(BaseProjectSourceType):
 @utils.registerClass
 class RemoteInstallationProjectSourceType(BaseProjectSourceType):
     
-    NAME = 'Remote installation'                    
+    NAME = 'Remote installation'
     
     #---------------------------------------------------------------------------
     @classmethod

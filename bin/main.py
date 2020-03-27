@@ -183,26 +183,26 @@ Description ...
         print('ansa_toolkit initialisation')    
                 
         INSTALL_PATHS = utils.getInstallTypePaths()['INSTALLATION_PATHS_TYPE_ANSA_BUTTON']
-         
+          
         # create directory structure for ansaTools
         print('Creating directory structure for ansaTools')
-        
+         
         ansaToolsLocation = INSTALL_PATHS['PRODUCTIVE_VERSION_HOME']
         if not os.path.exists(ansaToolsLocation):
             ansaToolsSource = os.path.join(utils.PATH_RES, 'templates', 'ansaTools')
             shutil.copytree(ansaToolsSource, ansaToolsLocation, symlinks=True)
         else:
             print('Directory already present: "%s"' % ansaToolsLocation)
-        
+         
         # create directory structure for ansa_toolkit
         print('Creating directory structure for ansa_toolkit')
-        
+         
         ansaToolKitLocation = os.path.join(
             os.path.dirname(INSTALL_PATHS['PRODUCTIVE_VERSION_HOME']), 'ansa_toolkit')
         if not os.path.exists(ansaToolKitLocation):        
             ansaToolkitSource = os.path.join(utils.PATH_RES, 'templates', 'ansa_toolkit')
             shutil.copytree(ansaToolkitSource, ansaToolKitLocation, symlinks=True)
-            
+             
             # create default symbolic link
             symLink = os.path.join(ansaToolKitLocation, 'default')
             try:         
@@ -212,39 +212,70 @@ Description ...
                 if os.path.islink(symLink):
                     os.unlink(symLink)
                 os.symlink(executable, symLink)
-                
+                 
             except Exception as e:
                 print('Failed to set default ansa_toolkit version! (%s)' % str(e))
-                                
+                                 
         else:
             print('Directory already present: "%s"' % ansaToolsLocation)
-        
+         
         # create directory for ansaTools repository
         print('Creating ansaTools repository directory')
-        
+         
         if not os.path.exists(INSTALL_PATHS['REPOS_PATH']):
             os.makedirs(INSTALL_PATHS['REPOS_PATH'])
         else:
             print('Directory already present: "%s"' % INSTALL_PATHS['REPOS_PATH'])
-                        
+                         
         # create symbolic link to initiateAnsaToolkit
         INSTALL_PATHS = utils.getInstallTypePaths()['INSTALLATION_PATHS_BASE']
-        
+         
         symLink = os.path.join(INSTALL_PATHS['GENERAL_PRODUCTIVE_VERSION_BIN'], 'initiateAnsaToolkit') 
         executable = os.path.join(ansaToolsLocation, 'initiateAnsaToolkit', 'initiateAnsaToolkit.py')
-        
+         
         if os.path.islink(symLink):
             os.unlink(symLink)
         os.symlink(executable, symLink)
-                
+                 
         # clone ansaChecksPlistUpdater
-        print('Cloning "ansaChecksPlistUpdater" from master repository.')
+        print('Initiating ANSA "checks".')
         
-        INSTALL_PATHS = utils.getInstallTypePaths()['INSTALLATION_PATHS_TYPE_ANSA_CHECK']        
-        if not os.path.exists(INSTALL_PATHS['CHECK_INSTALLER_PATH']):
-            githubio.Githubio.cloneProject('ansaChecksPlistUpdater', INSTALL_PATHS['REPOS_PATH'])
+        INSTALL_PATHS = utils.getInstallTypePaths()['INSTALLATION_PATHS_TYPE_ANSA_CHECK']
+        if not os.path.exists(INSTALL_PATHS['REPOS_PATH']):
+            githubio.Githubio.cloneProject('checks', 
+                os.path.dirname(INSTALL_PATHS['REPOS_PATH']))
+        
         else:
-            print('"ansaChecksPlistUpdater" already present: "%s"' % INSTALL_PATHS['CHECK_INSTALLER_PATH'])
+            print('"checks" already present: "%s"' % INSTALL_PATHS['REPOS_PATH'])
+            
+            githubio.Githubio.syncProject(INSTALL_PATHS['REPOS_PATH'])
+        
+        self._installAnsaChecks()
+            
+    #---------------------------------------------------------------------------
+    
+    def _installAnsaChecks(self):
+        
+        INSTALL_PATHS = utils.getInstallTypePaths()['INSTALLATION_PATHS_TYPE_ANSA_CHECK']
+        
+        # install last version
+        pyProjectPath = INSTALL_PATHS['REPOS_PATH']
+                
+        installer = pyProjectInstaller.ci.Installer()
+        ansaCheckInstallType = pyProjectInstaller.bi.InstallTypeAnsaCheck(installer)
+        
+        tagList, tagInfo = pyProjectInstaller.bi.LocalReposProjectSourceType.getTagInfo(pyProjectPath)
+        
+        revision = tagList[-1]
+        
+        if os.path.exists(os.path.join(INSTALL_PATHS['PRODUCTIVE_VERSION_HOME'], revision)):
+            print('Check version up-to-date (%s).' % revision)
+        else:
+            print('Installing ANSA checks: %s (%s)' % (revision, tagInfo[revision]))
+            
+            ansaCheckInstallType.install(
+                pyProjectPath, revision, 'applicationName',
+                'ANSA tools', 'IDIADA ANSA checks documentation.', 'docString')     
 
     #---------------------------------------------------------------------------
     
@@ -254,6 +285,9 @@ Description ...
         
         doc.di.ToolDocumentation.initiateFromGithub()
         
+        documentation = doc.di.ToolDocumentation()
+        documentation.create()
+        documentation.show()
         
 #=============================================================================
 

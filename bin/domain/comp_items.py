@@ -38,7 +38,7 @@ class Installer(object):
     #---------------------------------------------------------------------------
     
     def install(self):
-            
+                
         ''' This assumes that all checks have been passed so the new revision
         is made just when there was a new tag required. New revision is
         omitted otherwise.'''
@@ -47,7 +47,7 @@ class Installer(object):
         # creating a new revision
         for procedureItem in self.procedureItems.values():
             procedureItem.updateForInstallation()   
-        
+         
         # create revision only if source project type is local revision
         if self.projectSourceType is bi.LocalReposProjectSourceType:
             tagName = self.procedureItems[bi.VersionItem.NAME].tagName
@@ -57,7 +57,7 @@ class Installer(object):
                     self.procedureItems[bi.VersionItem.NAME].tagName,
                     self.procedureItems[bi.VersionItem.NAME].commitMessage,
                     self.procedureItems[bi.VersionItem.NAME].filesToAdd)
-           
+        
         self.procedureItems[bi.InstallationSetupItem.NAME].installTypeItem.install(
             self.pyProjectPath,
             self.procedureItems[bi.VersionItem.NAME].tagName,
@@ -69,11 +69,11 @@ class Installer(object):
         # create master repository if not installing ANSA check
         if self.getCurrentInstallType() != bi.BaseInstallType.TYPE_ANSA_CHECK \
             and self.projectSourceType is not bi.RemoteInstallationProjectSourceType:
-            
+             
             self._createMasterRepository()
-        
+         
         self._syncGitHubMasterRepository()
-        
+         
         # clean up temporary data
         self.projectSourceType.cleanUp()
     
@@ -176,6 +176,10 @@ class Installer(object):
         reposPath = self.procedureItems[bi.InstallationSetupItem.NAME].installTypeItem.REPOS_PATH
         projectName = self.procedureItems[bi.InstallationSetupItem.NAME].projectName
         masterReposPath = os.path.join(reposPath, projectName)
+        
+        if self.getCurrentInstallType() == bi.BaseInstallType.TYPE_ANSA_CHECK:
+            projectName = 'checks'
+            masterReposPath = reposPath
         
         # synchronise with github if not there already
         if self.projectSourceType is not bi.MasterReposProjectSourceType:
